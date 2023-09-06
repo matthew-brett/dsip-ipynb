@@ -3,7 +3,14 @@
 
 format: jb-book
 root: intro
-chapters:
-- file: markdown
-- file: notebooks
-- file: markdown-notebooks
+parts:
+- caption: Working with data
+  chapters:
+  - file: data_work
+
+- caption: The tools
+  chapters:
+  - file: to_code
+  - file: surviving_computers
+  - file: the_software
+  - file: installation
