@@ -1,6 +1,5 @@
 # Build requirements
 -r requirements.txt
--e .
 jupyter-book
 jupytext
 oktools
