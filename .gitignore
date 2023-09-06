@@ -1,0 +1,10 @@
+_build/
+# Output for cfdcode install.
+build/
+*.egg-info/
+__pycache__/
+_references.bib
+.ipynb_checkpoints/
+.ok_storage
+*.ipynb
+*.orig

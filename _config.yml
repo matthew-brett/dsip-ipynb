@@ -1,0 +1,71 @@
+# Book settings
+title : "Data Science in Practice"
+author: Matthew Brett and Peter Rush
+logo: images/dsfe_logo.png
+email: matthew.brett@gmail.com
+# >- starts a multiline string, where newlines replaced by spaces, and final
+# newlines are stripped.
+description: >-
+  Textbook for London Interdisciplinary School Data Science in Practice module.
+
+execute:
+  # 'cache' attempts to cache the results.
+  # 'auto' appears to be safer.
+  execute_notebooks: cache
+  timeout: 180
+
+exclude_patterns:
+  - README.md
+  - todo.md
+  - _scripts/*
+  - _notes/*
+  - bib/*
+  - images/LICENSE.md
+  - data/README.md
+  - .pytest_cache/*
+
+html:
+  favicon: images/dsfe_favicon.ico
+  home_page_in_navbar: false
+  use_edit_page_button: true
+  use_repository_button: true
+  use_issues_button: true
+  baseurl: https://lisds.github.io/textbook
+
+repository:
+  url: https://github.com/lisds/textbook
+  branch: main
+
+launch_buttons:
+  # The interface interactive links will activate ["classic", "jupyterlab"]
+  notebook_interface: "classic"
+  # The URL of the JupyterHub (e.g., https://datahub.berkeley.edu)
+  jupyterhub_url: "https://ds.lis.2i2c.cloud"
+  # The URL of the BinderHub (e.g., https://mybinder.org)
+  binderhub_url: "https://mybinder.org"
+  # The URL of Google Colab (e.g., https://colab.research.google.com)
+  # colab_url: "https://colab.research.google.com"
+  thebe: true
+
+sphinx:
+  config:
+    nb_custom_formats:
+      .Rmd:
+        - jupytext.reads
+        - fmt: Rmd
+
+    - IPython.sphinxext.ipython_console_highlighting
+
+latex:
+  latex_documents:
+    targetname: dsip_textbook.tex
+
+bibtex_bibfiles:
+  - bib/course_refs.bib
+
+# HTML redirection
+# Pages linked, but then renamed.
+redirection:
+  builddir : _build/html
+  redirects:
+    # data-types/Ranges: ../arrays/Ranges
