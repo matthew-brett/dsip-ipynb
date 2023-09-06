@@ -6,8 +6,6 @@ We are going to be using the following major software for the class:
 - [numpy](https://numpy.org) (the Python array package);
 - [matplotlib](https://matplotlib.org) (Python plotting package);
 - [scipy](https://scipy.org) (Python scientific library);
-- [nibabel](https://nipy.org/nibabel) (read / write of neuroimaging file
-  formats in Python);
 
 For the class and homework we will use:
 
@@ -53,13 +51,13 @@ make sure you are running a **Powershell** shell, not the much older Windows `cm
 Make a new directory to store your work:
 
 ```
-mkdir nipraxis-work
+mkdir dsip-work
 ```
 
 Change your shell to that directory:
 
 ```
-cd nipraxis-work
+cd dsip-work
 ```
 
 Confirm you are in the right directory with:
@@ -76,19 +74,19 @@ This Prints the Working Directory (pwd).  You should see something like the foll
 ```
 Path
 ----
-C:\Users\your-user\Documents\nipraxis-work
+C:\Users\your-user\Documents\dsip-work
 ```
 :::
 
 :::{tab-item} Mac
 ```
-/Users/your-user/Documents/nipraxis-work
+/Users/your-user/Documents/dsip-work
 ```
 :::
 
 :::{tab-item} Linux
 ```
-/home/your-user/Documents/nipraxis-work
+/home/your-user/Documents/dsip-work
 ```
 :::
 
@@ -121,7 +119,7 @@ pip 22.0.4 from <some-directory/site-packages/pip (python 3.10)
 Now finish the install with:
 
 ```
-pip3 install --user scipy matplotlib pandas scikit-image sympy nibabel jupyter ipython jupytext nipraxis okpy
+pip3 install --user scipy matplotlib pandas scikit-image sympy jupyter ipython jupytext okpy
 ```
 
 :::{note}
@@ -139,13 +137,15 @@ Keep the terminal open.
 Check your install by downloading {download}`check_install.py` to your
 computer.   Note where the file went.  For example, you might have downloaded the file to your `Downloads` directory.
 
-Move the file to your `Documents/nipraxis-work` directory.  You can use the terminal for this.  For example, if the file did appear in your default `Downloads` folder:
+Move the file to your `Documents/dsip-work` directory.  You can use the
+terminal for this.  For example, if the file did appear in your default
+`Downloads` folder:
 
 ```
 mv $HOME/Downloads/check_install.py .
 ```
 
-Check you do have the file in the `nipraxis-work` directory with:
+Check you do have the file in the `dsip-work` directory with:
 
 ```
 ls check_install.py
@@ -157,7 +157,7 @@ from your terminal.  You should see something like:
 
 :::{tab-item} Windows Powershell
 ```
-    Directory: C:\Users\your-user\Documents\nipraxis-work
+    Directory: C:\Users\your-user\Documents\dsip-work
 
 
 Mode                 LastWriteTime         Length Name
@@ -195,13 +195,13 @@ where the details in the first three lines will depend on your system.
 Finally, to get a copy of the textbook files:
 
 ```
-git clone https://github.com/nipraxis/textbook
+git clone https://github.com/lisds/dsip
 ```
 
 Now you can open the textbook notebooks with:
 
 ```
-cd textbook
+cd dsip
 python3 -m notebook
 ```
 

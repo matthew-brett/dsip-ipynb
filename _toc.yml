@@ -10,7 +10,5 @@ parts:
 
 - caption: The tools
   chapters:
-  - file: to_code
-  - file: surviving_computers
   - file: the_software
   - file: installation
