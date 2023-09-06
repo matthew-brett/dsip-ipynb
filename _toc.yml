@@ -10,5 +10,4 @@ parts:
 
 - caption: The tools
   chapters:
-  - file: the_software
   - file: installation
