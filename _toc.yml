@@ -11,3 +11,4 @@ parts:
 - caption: The tools
   chapters:
   - file: installation
+  - file: the-problem-with-notebooks
