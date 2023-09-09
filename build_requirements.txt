@@ -1,7 +1,9 @@
 # Build requirements
 -r requirements.txt
+# https://github.com/ProjectPythia/radar-cookbook/pull/84/files
+# format-nongpl error for older jsonschema
+jupyter_server<2
 jupyter-book
-jupytext
 oktools
 # To allow static build / upload
 ghp-import

@@ -3,9 +3,12 @@
 We are going to be using the following major software for the class:
 
 - [Python](https://python.org)
-- [numpy](https://numpy.org) (the Python array package);
-- [matplotlib](https://matplotlib.org) (Python plotting package);
-- [scipy](https://scipy.org) (Python scientific library);
+- [Numpy](https://numpy.org) (the Python array package);
+- [Pandas](https://pandas.pydata.org) (Loading and manipulating data);
+- [Matplotlib](https://matplotlib.org) (Standard plotting package);
+- [Scipy](https://scipy.org) (Python scientific library);
+- [Statsmodels](https://www.statsmodels.org) (Statistical models in Python);
+- [Scikit-learn](https://scikit-learn.org) (Standard machine-learning tools);
 
 For the class and homework we will use:
 
@@ -116,10 +119,36 @@ This should show you something like this:
 pip 22.0.4 from <some-directory/site-packages/pip (python 3.10)
 ```
 
-Now finish the install with:
+Next,  get a copy of all the textbook files:
 
 ```
-pip3 install --user scipy matplotlib pandas scikit-image sympy jupyter ipython jupytext okpy
+git clone https://github.com/lisds/dsip
+```
+
+Change directory to the new textbook directory:
+
+```
+cd dsip
+```
+
+Confirm you are in the `dsip` textbook directory `pwd` (Print Working Directory):
+
+```
+pwd
+```
+
+Check that the `requirements.txt` file came down with the rest of the textbook files with:
+
+```
+ls requirements.txt
+```
+
+The `requirements.txt` file has a list of the Python packages to install for the class.
+
+Now finish the Python part of the install with:
+
+```
+pip3 install --user -r requirements.txt
 ```
 
 :::{note}
@@ -134,18 +163,10 @@ WARNING: The script <some-program> is installed in 'C:\Users\scipy\AppData\Roami
 
 Keep the terminal open.
 
-Check your install by downloading {download}`check_install.py` to your
-computer.   Note where the file went.  For example, you might have downloaded the file to your `Downloads` directory.
+Finally, check that your installation has worked correctly by running the `check_install.py` file included with the textbook files.
 
-Move the file to your `Documents/dsip-work` directory.  You can use the
-terminal for this.  For example, if the file did appear in your default
-`Downloads` folder:
-
-```
-mv $HOME/Downloads/check_install.py .
-```
-
-Check you do have the file in the `dsip-work` directory with:
+Start by looking for the `check_install.py` file in your working directory
+(`dsip`) with:
 
 ```
 ls check_install.py
@@ -157,7 +178,7 @@ from your terminal.  You should see something like:
 
 :::{tab-item} Windows Powershell
 ```
-    Directory: C:\Users\your-user\Documents\dsip-work
+    Directory: C:\Users\your-user\Documents\dsip-work\dsip
 
 
 Mode                 LastWriteTime         Length Name
@@ -192,18 +213,11 @@ Congratulations, all checks passed
 
 where the details in the first three lines will depend on your system.
 
-Finally, to get a copy of the textbook files:
-
-```
-git clone https://github.com/lisds/dsip
-```
-
 Now you can open the textbook notebooks with:
 
 ```
-cd dsip
 python3 -m notebook
 ```
 
-This will open your web browser in the Jupyter interface.  Select the file you
-are interested in.
+from the `dsip` textbook directory. This will open your web browser in the
+Jupyter interface.  Select the file you are interested in.
