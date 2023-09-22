@@ -4,6 +4,10 @@
 format: jb-book
 root: intro
 parts:
+- caption: Coding background
+  chapters:
+  - file: assert
+  - file: pathlib
 - caption: Working with data
   chapters:
   - file: data_work
