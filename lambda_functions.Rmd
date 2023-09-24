@@ -1,0 +1,131 @@
+---
+jupyter:
+  jupytext:
+    notebook_metadata_filter: all,-language_info
+    split_at_heading: true
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.2'
+      jupytext_version: 1.14.6
+  kernelspec:
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
+---
+
+# Lambda functions
+
+```{python}
+import pandas as pd
+pd.set_option('mode.copy_on_write', True)
+import matplotlib.pyplot as plt
+```
+
+Here are some estimated global temperature data, from 1850 through 2000.
+
+See the [dataset page](https://github.com/odsti/datasets/tree/main/berkeley_global) for more detail.
+
+```{python}
+temperatures = pd.read_csv('data/global_temperature_quarters.csv')
+temperatures
+```
+
+Imagine a function like this:
+
+```{python}
+def degrees_c_to_f(c):
+    return c * 1.8 + 32
+```
+
+Notice that `degrees_c_to_f` is now a value, that is of type `function`:
+
+```{python}
+degrees_c_to_f
+```
+
+```{python}
+degrees_c_to_f(0)
+```
+
+```{python}
+degrees_c_to_f(10)
+```
+
+```{python}
+temperatures['Temperature'].apply(degrees_c_to_f)
+```
+
+Sometimes we don't want to go to the bother of typing out the whole function with its `def` and name.   In that case we may want to use a `lambda` function.
+
+A `lambda` function is a short-hand for defining a function, the doesn't need a `def` and does not define a function name.  It is a way of giving the recipe in a single expression.  For example, here is an expression that defines the same function as we saw above, but using `lambda`:
+
+```{python}
+lambda c : c * 1.8 + 32
+```
+
+Notice that this expression, like the `def` block above, results in an expression.  Notice too that this function does not have a name.
+
+
+We could give this function a name by attaching the result of the expression to a variable, with our usual assignment statement:
+
+```{python}
+c2f_func = lambda c : c * 1.8 + 32
+```
+
+We can then use the function just as we used the `def` function we defined before:
+
+```{python}
+c2f_func(0)
+```
+
+```{python}
+c2f_func(10)
+```
+
+Notice the structure of the `lambda` expression.
+
+First we have `lambda`.
+
+Then we have the *argument name* or names, in our case `c`.  This is the name that the function argument will get when we call the function.   For example, when we call `c2f_func(0)`, `c` will get the value 0.
+
+Next we have a colon `:` to signal that the function body follows.  For a `lambda`, the function body must be an expression.  Remember, an expression is code that returns a value.
+
+In our case, the expression is `c * 1.8 + 32`.
+
+```{python}
+temperatures['Temperature'].apply(c2f_func)
+```
+
+Why would we use this `lambda` shortcut?   Just because it is a shortcut.   We could write our whole conversion like this:
+
+```{python}
+temperatures['Temperature'].apply(lambda c : c * 1.8 + 32)
+```
+
+rather than:
+
+```{python}
+def degrees_c_to_f(c):
+    return c * 1.8 + 32
+
+temperatures['Temperature'].apply(degrees_c_to_f)
+```
+
+In fact, a lambda function can have more than one argument.  In that case you name the arguments before the colon, and then use them in the function expression:
+
+```{python}
+# arguments are c and z, where z is the value in Fahrenheit
+# at zero centigrade.
+c2f_two = lambda c, z : c * 1.8 + z
+```
+
+```{python}
+c2f_two(0, 32)
+```
+
+```{python}
+c2f_two(10, 32)
+```
+
+We can't as easily use these two-argument lambdas for Pandas `apply` functions, because apply functions only accept one argument, by default.

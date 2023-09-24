@@ -8,13 +8,13 @@ parts:
   chapters:
   - file: assert
   - file: pathlib
+  - file: lambda_functions
 - caption: Reading formulae
   chapters:
   - file: algebra_of_sums
 - caption: Working with data
   chapters:
   - file: data_work
-
 - caption: The tools
   chapters:
   - file: installation
