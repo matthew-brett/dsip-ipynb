@@ -85,11 +85,18 @@ c2f_func(10)
 
 Notice the structure of the `lambda` expression.
 
-First we have `lambda`.
+1. `lambda` then
+2. the argument(s) to the new function, here `c`, then
+3. `:` then
+4. a single expression, here `c * 1.8 + 32`.
 
-Then we have the *argument name* or names, in our case `c`.  This is the name that the function argument will get when we call the function.   For example, when we call `c2f_func(0)`, `c` will get the value 0.
+After `lambda` we have the *argument name* or names, in our case `c`.  This
+is the name that the function argument will get when we call the function.
+For example, when we call `c2f_func(0)`, `c` will get the value 0.
 
-Next we have a colon `:` to signal that the function body follows.  For a `lambda`, the function body must be an expression.  Remember, an expression is code that returns a value.
+The colon `:` signals that the function body follows.  For a `lambda`, the
+function body must be an expression.  Remember, an expression is code that
+returns a value.
 
 In our case, the expression is `c * 1.8 + 32`.
 
@@ -97,7 +104,8 @@ In our case, the expression is `c * 1.8 + 32`.
 temperatures['Temperature'].apply(c2f_func)
 ```
 
-Why would we use this `lambda` shortcut?   Just because it is a shortcut.   We could write our whole conversion like this:
+Why would we use this `lambda` shortcut?   Just because it is a shortcut.
+We could write our whole conversion like this:
 
 ```{python}
 temperatures['Temperature'].apply(lambda c : c * 1.8 + 32)
@@ -112,20 +120,74 @@ def degrees_c_to_f(c):
 temperatures['Temperature'].apply(degrees_c_to_f)
 ```
 
-In fact, a lambda function can have more than one argument.  In that case you name the arguments before the colon, and then use them in the function expression:
+## More than one argument
+
+The lambda function above has a single argument, and this is typical of
+lambda functions that you might use with Pandas `apply`.  But, in general,
+lambda functions can have more than one argument.
+
+For example, consider the case where you wanted to allow the function to
+work with degrees in Celsius, or degrees in Kelvin.  You may remember that
+one degree on the Celsius scale is the same as one degree on the Kelvin
+scale — but Celsius has 0 at the melting point of water, and Kelvin sets
+0 at absolute 0.  Therefore 0 degrees in Celsius is 273.15 degrees in
+Kelvin.
+
+We can take this into account in our function, but adding a second argument,
+which gives the temperature for zero in the given scale.
+
+For example, to converting 10 degrees in Celsius to Fahrenheit we multiply
+by 1.8 and add the number of Fahrenheit degrees for 0 Celsius.
+
+```{python}
+# 10 degrees Celsius to Fahrenheit
+10 * 1.8 + 32
+```
+
+Converting 10 degrees in Kelvin to Fahrenheit involves multiplying by 1.8
+and add the number of Fahrenheit degrees for 0 Kelvin.
+
+```{python}
+zero_k_in_f = 32 - 273.15 * 1.8
+zero_k_in_f
+```
+
+Therefore, to convert from Kelvin to Fahrenheit
+
+```{python}
+# 10 degrees Kelvin to Fahrenheit
+10 * 1.8 + zero_k_in_f
+```
+
+We can use a second argument to our lambda to take this into account, which
+is the Fahrenheit value for 0 in (Celsius or Kelvin).
+
+To use two (or more) arguments to a lambda, you name the arguments before
+the colon, and then use them in the function expression.
+
+Here is a more general lambda, taking two arguments, the first for the
+degrees in (Celsius or Kelvin), the second for the Fahrenheit value of 0 on
+the relevant scale: 32 for Celsius, `32 - 273.15 * 1.8 =  -459.67` for
+Kelvin.
+
 
 ```{python}
 # arguments are c and z, where z is the value in Fahrenheit
-# at zero centigrade.
-c2f_two = lambda c, z : c * 1.8 + z
+# at zero on the given scale (Celsius or Kelvin).
+c2f_again = lambda c, z : c * 1.8 + z
 ```
+
+Use the two-argument function to convert from Celsius to Fahrenheit:
 
 ```{python}
-c2f_two(0, 32)
+c2f_again(10, 32)
 ```
+
+Use the two-argument function to convert from Kelvin to Fahrenheit:
 
 ```{python}
-c2f_two(10, 32)
+c2f_again(10, -459.67)
 ```
 
-We can't as easily use these two-argument lambdas for Pandas `apply` functions, because apply functions only accept one argument, by default.
+We can't as easily use these two-argument lambdas for Pandas `apply`
+functions, because apply functions only accept one argument, by default.
