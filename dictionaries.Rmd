@@ -1,0 +1,130 @@
+---
+jupyter:
+  jupytext:
+    notebook_metadata_filter: all,-language_info
+    split_at_heading: true
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.2'
+      jupytext_version: 1.15.2
+  kernelspec:
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
+---
+
+Dictionaries are *mappings*.  They give the relationships between things.
+
+This will be clearer with an example.
+
+Let's say we are interested in the English Premier League.
+
+In particular, we are interested in wage bills of each team.  And we are particularly interested in teams outside London, suspecting that teams in London have to spend more in wages, because London is such an expensive city.
+
+We consult the data at <https://www.spotrac.com/epl/payroll/2022/>, and we find these figures:
+
+* Manchester City came first in the League, and spent an estimated £185,240,000 on wages.
+* Manchester United came third in the League, and spent an estimated £212,135,000 on wages.
+* Liverpool came fifth, and spent £160,868,000.
+
+
+We want a way to store the correspondence (or *mapping*) between the name of team and their wage bill.  If we have the team name, we want to be able to fetch the corresponding wage bill.
+
+
+One way of doing this is a basic Python data type called a *dictionary*.
+
+
+Here is an empty dictionary:
+
+```{python}
+wages = {}
+wages
+```
+
+```{python}
+type(wages)
+```
+
+We can fill this dictionary by entering pairs of values.  The pair is in the form of a *key* and a *value*.   To start with, let us put the key and value into their own variables.
+
+```{python}
+key = 'Manchester City'
+value = 185_240_000
+value
+```
+
+By the way, notice the underscores in `185_240_000`.  These are just for decoration, to make it easier for us humans to read the number we typed in.  Notice that Python still reads this number as if it had no underscores.  The underscores look nice where they are, because they delimit the thousands and millions, but Python just ignores them; you can put them anywhere you want:
+
+```{python}
+18_52_4000_0
+```
+
+Now back to the key and the value.   We enter this pair into the dictionary like this:
+
+```{python}
+wages[key] = value
+wages
+```
+
+Notice that the dictionary is now no longer empty.  It has one *entry*, where the entry consists of our key and our value.  This entry says:
+
+> if you ask "Manchester City", I'll answer 185240000
+
+That is, if you give the dictionary the key "Manchester City" it will return the corresponding value 18524000.
+
+You *give* the dictionary the key by *indexing*.  Indexing occurs where we follow the value (here `wages`) by square brackets `[]`.  Inside the square brackets we put the key for which we want the value:
+
+```{python}
+# Indexing into the dictionary with a key gives 
+# the corresponding value.
+wages['Manchester City']
+```
+
+Now let us enter the other key value pairs:
+
+```{python}
+wages['Manchester United'] = 212_135_000 
+wages['Liverpool'] = 160_868_000
+wages
+```
+
+Notice the dictionary has three entries now.  Each entry is the pair of *key* (the team name) and *value* (the corresponding wage bill.
+
+
+We can fetch the wage bills corresponding to each team, using the team name:
+
+```{python}
+wages['Manchester United']
+```
+
+```{python}
+wages['Liverpool']
+```
+
+Here we first created an empty dictionary, and filled in the three elements with assignment statements like:
+
+```{python}
+wages['Manchester United'] = 212135000
+```
+
+We can also create dictionaries directly with key, value pairs, like this:
+
+```{python}
+# Creating the dictionary and adding the key, value pairs.
+wages_again = {'Manchester City': 185_240_000,
+               'Manchester United': 212_135_000,
+               'Liverpool': 160_868_000}
+wages_again
+```
+
+Notice the syntax for the value on the left hand side that creates the dictonary.  There is:
+
+* Open curly brackets `{` followed by none or more of:
+    * Key value pairs, written as:
+       * The key then
+       * colon `:`
+       * the value then
+       * a comma (if more key value pairs follow).
+       * 
+* finished with a closing curly bracket `}`

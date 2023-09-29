@@ -9,6 +9,7 @@ parts:
   - file: assert
   - file: pathlib
   - file: lambda_functions
+  - file: dictionaries
 - caption: Reading formulae
   chapters:
   - file: algebra_of_sums
