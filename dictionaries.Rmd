@@ -118,13 +118,13 @@ wages_again = {'Manchester City': 185_240_000,
 wages_again
 ```
 
-Notice the syntax for the value on the left hand side that creates the dictonary.  There is:
+Notice the syntax for the value on the left hand side that creates the
+dictionary.  There is:
 
-* Open curly brackets `{` followed by none or more of:
+* An open curly bracket `{` followed by none or more of:
     * Key value pairs, written as:
        * The key then
        * colon `:`
        * the value then
        * a comma (if more key value pairs follow).
-       * 
-* finished with a closing curly bracket `}`
+* A closing curly bracket `}`.
