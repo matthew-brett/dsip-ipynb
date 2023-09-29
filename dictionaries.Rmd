@@ -18,11 +18,11 @@ Dictionaries are *mappings*.  They give the relationships between things.
 
 This will be clearer with an example.
 
-Let's say we are interested in the English Premier League.
+Let's say we are interested in the English Premier League (EPL).
 
 In particular, we are interested in wage bills of each team.  And we are particularly interested in teams outside London, suspecting that teams in London have to spend more in wages, because London is such an expensive city.
 
-We consult the data at <https://www.spotrac.com/epl/payroll/2022/>, and we find these figures:
+We consult the data on [2022-2023 EPL wages](https://www.spotrac.com/epl/payroll/2022), and the [EPL league table](https://en.wikipedia.org/wiki/2022%E2%80%9323_Premier_League) and we find these values:
 
 * Manchester City came first in the League, and spent an estimated £185,240,000 on wages.
 * Manchester United came third in the League, and spent an estimated £212,135,000 on wages.
