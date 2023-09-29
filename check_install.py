@@ -21,7 +21,16 @@ PACKAGES = {
     'jupyter': 'jupyter',
     'ipython': 'IPython',
     'jupytext': 'jupytext',
-    'okpy': 'client'}
+    'okpy': 'client',
+    'xlrd': 'xlrd',
+    'openpyxl': 'openpyxl',
+    'scipy': 'scipy',
+    'ipython': 'IPython',
+    'statsmodels': 'statsmodels',
+    'sqlalchemy': 'sqlalchemy',
+    'scikit-learn': 'sklearn',
+    'sympy': 'sympy'
+}
 
 import sys
 import platform

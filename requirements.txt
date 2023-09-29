@@ -10,4 +10,5 @@ statsmodels
 sqlalchemy
 statsmodels
 scikit-learn
+scikit-image
 sympy
