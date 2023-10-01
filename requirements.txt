@@ -6,7 +6,6 @@ openpyxl
 scipy
 ipython
 jupytext
-statsmodels
 sqlalchemy
 statsmodels
 scikit-learn
