@@ -143,12 +143,22 @@ Application     python3.exe  3.10.41... C:\Python310\python3.exe
 
 ## An extra step
 
-```
-site_path=python3 -c "import site; print(site.USER_BASE + '\Scripts')"
+You need to make sure that your new commands, installed in the installation step, are available at the terminal.
+
+To do this, you need to find the directory in which the new commands are
+stored.  You can do this from your Powershell terminal.
+
+```powershell
+# Find the directory with the new commands.
+$site_path=python3 -c "import site; print(site.USER_BASE + '\Scripts')"
+echo $site_path
 ```
 
+If you want, you can add this directory to the list of directories that Windowspp9jhhhhhjjjjjj
+
 ```
-[Environment]::SetEnvironmentVariable("PATH", "$env:PATH:$site_path", [System.EnvironmentVariableTarget]::User)
+$user_path=[Environment]::SetEnvironmentVariable("PATH", "User")
+[Environment]::SetEnvironmentVariable("PATH", "$user_path:$site_path", [System.EnvironmentVariableTarget]::User)
 ```
 
 
