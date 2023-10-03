@@ -150,22 +150,28 @@ stored.  You can do this from your Powershell terminal.
 
 ```powershell
 # Find the directory with the new commands.
-$site_path=python3 -c "import site; print(site.USER_BASE + '\Python311\Scripts')"
+$site_path=python3 -c 'import os,sysconfig;print(sysconfig.get_path("scripts",f"{os.name}_user"))'
 echo $site_path
 ```
 
 You should add this directory to the list of directories that Windows
 searches for new programs.  This list of directories is called the "PATH".
 
-You can do this via the GUI.
+You can do this via the GUI if you want.  What you are trying to do is add the
+directory above to your PATH environment variable for your user.  See [editing
+environment variables on
+Windows](https://www.computerhope.com/issues/ch000549.htm) for details.
 
-Here is how to add 
+On the other hand, you might consider using this complicated couple of
+commands, copy-pasted into the same Powershell terminal you used above.
 
 ```
 $user_path=[Environment]::GetEnvironmentVariable("PATH", "User")
-[Environment]::SetEnvironmentVariable("PATH", "$user_path:$site_path", [System.EnvironmentVariableTarget]::User)
+[Environment]::SetEnvironmentVariable("PATH", "$user_path;$site_path", [System.EnvironmentVariableTarget]::User)
 ```
 
+Whether you used the GUI or the Powershell command, close your Powershell
+terminal, and open it again to see the changes.
 
 ## To finish
 

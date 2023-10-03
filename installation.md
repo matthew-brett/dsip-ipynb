@@ -216,7 +216,7 @@ where the details in the first three lines will depend on your system.
 Now you can open the textbook notebooks with:
 
 ```
-python3 -m notebook
+python3 -m jupyter lab
 ```
 
 from the `dsip` textbook directory. This will open your web browser in the
