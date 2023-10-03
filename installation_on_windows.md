@@ -162,7 +162,7 @@ You can do this via the GUI.
 Here is how to add 
 
 ```
-$user_path=[Environment]::SetEnvironmentVariable("PATH", "User")
+$user_path=[Environment]::GetEnvironmentVariable("PATH", "User")
 [Environment]::SetEnvironmentVariable("PATH", "$user_path:$site_path", [System.EnvironmentVariableTarget]::User)
 ```
 
