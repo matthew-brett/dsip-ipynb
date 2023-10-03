@@ -13,3 +13,4 @@ scikit-image
 sympy
 okpy
 jupytext
+notebook
