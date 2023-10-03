@@ -141,6 +141,19 @@ CommandType     Name         Version    Source
 Application     python3.exe  3.10.41... C:\Python310\python3.exe
 ```
 
+## An extra step
+
+```
+python3 -c 'import site; print(site.USER_BASE + "/Scripts")'
+```
+
+```
+[Environment]::SetEnvironmentVariable
+     ("PATH", "$env:PATH:$HOME\AppData\Roaming\Python\Python311\Scripts",
+     [System.EnvironmentVariableTarget]::User)
+```
+
+
 ## To finish
 
 Close the Powershell.  All done.
