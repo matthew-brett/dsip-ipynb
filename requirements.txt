@@ -11,3 +11,5 @@ statsmodels
 scikit-learn
 scikit-image
 sympy
+okpy
+jupytext
