@@ -7,7 +7,7 @@ parts:
 - caption: Coding background
   chapters:
   - file: assert
-  - file: arrays_images
+  - file: arrays_and_images
   - file: pathlib
   - file: lambda_functions
   - file: dictionaries
