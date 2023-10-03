@@ -150,11 +150,16 @@ stored.  You can do this from your Powershell terminal.
 
 ```powershell
 # Find the directory with the new commands.
-$site_path=python3 -c "import site; print(site.USER_BASE + '\Scripts')"
+$site_path=python3 -c "import site; print(site.USER_BASE + '\Python311\Scripts')"
 echo $site_path
 ```
 
-If you want, you can add this directory to the list of directories that Windowspp9jhhhhhjjjjjj
+You should add this directory to the list of directories that Windows
+searches for new programs.  This list of directories is called the "PATH".
+
+You can do this via the GUI.
+
+Here is how to add 
 
 ```
 $user_path=[Environment]::SetEnvironmentVariable("PATH", "User")
