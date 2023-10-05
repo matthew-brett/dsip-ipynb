@@ -53,6 +53,7 @@ sphinx:
       .Rmd:
         - jupytext.reads
         - fmt: Rmd
+    mathjax_path: https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
 
   extra_extensions:
     # Needed as of 5 Dec 2022 - release of IPython 8.7.0
