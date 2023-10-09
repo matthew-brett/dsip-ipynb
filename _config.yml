@@ -30,10 +30,10 @@ html:
   use_edit_page_button: true
   use_repository_button: true
   use_issues_button: true
-  baseurl: https://lisds.github.io/textbook
+  baseurl: https://lisds.github.io/dsip
 
 repository:
-  url: https://github.com/lisds/textbook
+  url: https://github.com/lisds/dsip
   branch: main
 
 launch_buttons:
