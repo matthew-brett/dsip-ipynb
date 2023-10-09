@@ -13,6 +13,7 @@ parts:
   - file: dictionaries
 - caption: Reading formulae
   chapters:
+  - file: numpy_and_vectors
   - file: algebra_of_sums
 - caption: Working with data
   chapters:
