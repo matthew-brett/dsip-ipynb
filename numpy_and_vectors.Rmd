@@ -115,14 +115,17 @@ We find the same parallels between Numpy and mathematical notation for adding an
 Remember we write the calculation of the errors with:
 
 $$
-\vec{e} = \hat{y} - \hat{\vec{y}}
+\vec{e} = \vec{y} - \hat{\vec{y}}
 $$
 
-That is $\hat{\vec{y}} = [y_1 - \hat{y_1}, y_2 - \hat{y_2}, ..., y_n - \hat{y_n}]$ 
+That is $\hat{\vec{y}} = [y_1 - \hat{y_1}, y_2 - \hat{y_2}, ..., y_n
+- \hat{y_n}]$ 
 
-When we subtract (or add) two vectors, the result is the *element by element* subtraction of the values in the vectors.
+When we subtract (or add) two vectors, the result is the *element by element*
+subtraction of the values in the vectors.
 
-This is Numpy's idea as well.  This means we can write the mathematical formulation more or less directly in code:
+This is Numpy's idea as well.  This means we can write the mathematical
+formulation more or less directly in code:
 
 ```{python}
 # Calculate e vector from y and y_hat
