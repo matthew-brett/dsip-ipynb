@@ -48,7 +48,8 @@ Let's guess a slope and intercept:
 ```{python}
 plt.scatter(x, y)
 # Put 0, 0 on the plot.
-limits = [0, np.max(x), 0, np.max(y)]
+x_min, x_max, y_min, y_max = plt.axis()
+limits = [0, x_max, 0, y_max]
 plt.axis(limits);
 ```
 
@@ -114,7 +115,7 @@ We find the same parallels between Numpy and mathematical notation for adding an
 Remember we write the calculation of the errors with:
 
 $$
-\vec{e} = \hat{y} - \hat{vec{y}}
+\vec{e} = \hat{y} - \hat{\vec{y}}
 $$
 
 That is $\hat{\vec{y}} = [y_1 - \hat{y_1}, y_2 - \hat{y_2}, ..., y_n - \hat{y_n}]$ 
