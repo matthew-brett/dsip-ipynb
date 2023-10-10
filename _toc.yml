@@ -8,6 +8,9 @@ parts:
   chapters:
   - file: assert
   - file: arrays_and_images
+  - file: where_and_argmin
+  - file: where_2d
+  - file: image_for_optimize
   - file: pathlib
   - file: lambda_functions
   - file: dictionaries

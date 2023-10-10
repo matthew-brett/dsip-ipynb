@@ -1,0 +1,113 @@
+---
+jupyter:
+  orphan: true
+  jupytext:
+    notebook_metadata_filter: all,-language_info
+    split_at_heading: true
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.2'
+      jupytext_version: 1.15.2
+  kernelspec:
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
+---
+
+# 2D arrays and optimization
+
+```{python}
+import numpy as np
+import pandas as pd
+pd.set_option('mode.copy_on_write', True)
+
+import scipy.stats as sps
+
+import matplotlib.pyplot as plt
+```
+
+We return again to the income and prestige data from Duncan
+{cite}`duncan1961socioeconomic`.
+
+```{python}
+top_15 = pd.read_csv("data/Duncan_Occupational_Prestige.csv").head(15)
+top_15
+```
+
+```{python}
+x = top_15['income']
+y = top_15['prestige']
+plt.scatter(x, y)
+plt.xlabel('Income')
+plt.ylabel('Prestige')
+```
+
+```{python}
+candidate_slopes = np.linspace(0, 0.6, 500)
+candidate_slopes[:10]
+```
+
+```{python}
+candidate_inters = np.linspace(50, 70, 500)
+candidate_inters[:10]
+```
+
+```{python}
+def rmse_for_b_c(b, c, x, y):
+    """ Root mean squared error for slope `b` intercept `c`
+    """
+    y_hat = b * x + c
+    e = y - y_hat
+    return np.sqrt(np.mean(e ** 2))
+```
+
+
+```{python}
+rmse_for_b_c(0.7, 30, x, y)
+```
+
+```{python}
+n_slopes = len(candidate_slopes)
+n_inters = len(candidate_inters)
+rmses = np.zeros((n_slopes, n_inters))
+```
+
+```{python}
+for slope_no in range(n_slopes):
+    for inter_no in range(n_inters):
+        b = candidate_slopes[slope_no]
+        c = candidate_inters[inter_no]
+        rmses[slope_no, inter_no] = rmse_for_b_c(b, c, x, y)
+```
+
+```{python}
+plt.imshow(rmses, cmap='gray')
+plt.ylabel('Slopes')
+plt.xlabel('Intercepts')
+min_rmse = np.min(rmses)
+min_rmse
+```
+
+```{python}
+row_min_inds, col_min_inds = np.where(rmses == min_rmse)
+row_min_inds, col_min_inds
+```
+
+
+```{python}
+best_slope = candidate_slopes[row_min_inds]
+best_inter = candidate_inters[col_min_inds]
+print('Best slope', best_slope)
+print('Best inter', best_inter)
+```
+
+```{python}
+lr_res = sps.linregress(x, y)
+lr_res
+```
+
+```{python}
+# Just because we can.
+lr_res.slope * np.std(x) / np.std(y)
+```
