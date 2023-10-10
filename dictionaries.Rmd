@@ -353,6 +353,53 @@ for key, value in wages.items():
     print('This value is', value)
 ```
 
+## Update
+
+Dictionaries have an `update()` method that pulls key, value pairs across from another dictionary:
+
+```{python}
+wages
+```
+
+```{python}
+new_wages = {'West Bromwich Albion': 4_716_200,
+             'Hull City': 520_000}
+```
+
+```{python}
+result = wages.update(new_wages)
+result
+```
+
+Notice that Jupyter / IPython does not display anything for the result.
+
+This is because the thing that came back from that operation was the value `None`:
+
+```{python}
+result is None
+```
+
+Python sends back that result to remind you that the `update()` is not creating a new dictionary, it is updating the original dictionary, in this case, `wages`.  Notice that `wages` now has the new keys and values:
+
+```{python}
+# Update modified 'wages'
+wages
+```
+
+`update()` will overwrite key, value pairs that exist already in the left-hand-side dictionary.
+
+```{python}
+# Notice new, different value for Man City.
+more_new_wages = {'Sheffield': 15_679_600,
+                  'Manchester City': 100_000_000}
+```
+
+```{python}
+wages.update(more_new_wages)  # Returns None
+# wages modified
+wages
+```
+
 ## Keys don't have to be strings
 
 So far we have used strings as the `dict` keys.  Strings are the most common
@@ -372,7 +419,12 @@ by_position = {1: 'Manchester City',
 by_position
 ```
 
-Notice that the *keys* here are numbers, and the *values* are strings.
+Notice that the *keys* here are numbers, and the *values* are strings.  As ever, the we get the values by indexing with the corresponding key:
+
+```{python}
+by_position[4]
+```
+
 
 We can use many other types as keys, but in practice you won't need this
 feature often in your programming life; you can look up dictionaries in more
