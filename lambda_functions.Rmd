@@ -126,68 +126,41 @@ The lambda function above has a single argument, and this is typical of
 lambda functions that you might use with Pandas `apply`.  But, in general,
 lambda functions can have more than one argument.
 
-For example, consider the case where you wanted to allow the function to
-work with degrees in Celsius, or degrees in Kelvin.  You may remember that
-one degree on the Celsius scale is the same as one degree on the Kelvin
-scale — but Celsius has 0 at the melting point of water, and Kelvin sets
-0 at absolute 0.  Therefore 0 degrees in Celsius is 273.15 degrees in
-Kelvin.
+We couldn't think of a very good and simple example of using two arguments with a lambda, so we hope you'll forgive us if we use a silly example.
 
-We can take this into account in our function, but adding a second argument,
-which gives the temperature for zero in the given scale.
-
-For example, to converting 10 degrees in Celsius to Fahrenheit we multiply
-by 1.8 and add the number of Fahrenheit degrees for 0 Celsius.
+Let's say you had a function like this:
 
 ```{python}
-# 10 degrees Celsius to Fahrenheit
-10 * 1.8 + 32
+def times_and_add(x, y):
+    return x * y + 10
 ```
-
-Converting 10 degrees in Kelvin to Fahrenheit involves multiplying by 1.8
-and add the number of Fahrenheit degrees for 0 Kelvin.
 
 ```{python}
-zero_k_in_f = 32 - 273.15 * 1.8
-zero_k_in_f
+times_and_add(2, 4)  # 2 * 4 + 10
 ```
-
-Therefore, to convert from Kelvin to Fahrenheit
 
 ```{python}
-# 10 degrees Kelvin to Fahrenheit
-10 * 1.8 + zero_k_in_f
+times_and_add(5, -1)  # 5 * -1 + 10
 ```
 
-We can use a second argument to our lambda to take this into account, which
-is the Fahrenheit value for 0 in (Celsius or Kelvin).
+`times_and_add` has two arguments, `x` and `y`.
 
-To use two (or more) arguments to a lambda, you name the arguments before
-the colon, and then use them in the function expression.
-
-Here is a more general lambda, taking two arguments, the first for the
-degrees in (Celsius or Kelvin), the second for the Fahrenheit value of 0 on
-the relevant scale: 32 for Celsius, `32 - 273.15 * 1.8 =  -459.67` for
-Kelvin.
-
+We can write this same function as a lambda with two arguments.  Separate the names of the two arguments with a comma before the colon and the function expression:
 
 ```{python}
-# arguments are c and z, where z is the value in Fahrenheit
-# at zero on the given scale (Celsius or Kelvin).
-c2f_again = lambda c, z : c * 1.8 + z
+# name = lambda arg1, arg2 : expression
+func = lambda x, y: x * y + 10
 ```
-
-Use the two-argument function to convert from Celsius to Fahrenheit:
 
 ```{python}
-c2f_again(10, 32)
+func(2, 4)  # 2 * 4 + 10
 ```
-
-Use the two-argument function to convert from Kelvin to Fahrenheit:
 
 ```{python}
-c2f_again(10, -459.67)
+func(5, -1)  # 5 * -1 + 10
 ```
 
-We can't as easily use these two-argument lambdas for Pandas `apply`
-functions, because apply functions only accept one argument, by default.
+We can't as easily use these two-argument lambdas for Pandas `apply` functions,
+because apply functions only accept one argument, by default, but it can be
+done.  See the arguments to the `apply` method for the tools you will need if
+you do want to do this.
