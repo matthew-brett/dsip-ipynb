@@ -8,7 +8,7 @@ jupyter:
       extension: .Rmd
       format_name: rmarkdown
       format_version: '1.2'
-      jupytext_version: 1.15.2
+      jupytext_version: 1.14.5
   kernelspec:
     display_name: Python 3 (ipykernel)
     language: python
@@ -23,7 +23,7 @@ seen for [linear regression models with a single
 predictor](lin_regression_notation).
  
 We will add the same caveat as before: this page will most likely be
-challenging if you a new to this, so please do not worry if you do not
+challenging if you are new to this, so please do not worry if you do not
 understand some concepts the first time you read them.
 
 But do keep reading, and re-reading.  You'll get there.
@@ -603,7 +603,7 @@ Where in our case:
 However, if we include extra predictors (three, or four, or five...) then we
 will have to use new symbols for each one, which will get cumbersome.
 
-<!-- #region -->
+
 Instead we add a subscript to the mathematical notation for each predictor
 variable, like this:
 
@@ -654,7 +654,7 @@ our case $n = 15$, as there are 15 observations. So we can also write the final
 value in each vector as:
 
 * $\Large x_{1_n}$ is the *final* value from $ \Large \vec{x_1}$, which in this case has 15 values, so can also be written as $ \Large x_{1_{15}}$
-<!-- #endregion -->
+
 
 Now we can refer to our `education` as our $x_1$ vector and `income` as our
 $x_2$ vector, the whole model, with both predictors, in mathematical notations
@@ -757,7 +757,6 @@ def ss_any_line(b_and_c, x_vector, y_vector):
     return np.sum(error ** 2)
 ```
 
-<!-- #region -->
 - We then pass our cost function to `minimize` and it tries multiple $b$ and $c$
   pairs until it finds the pair that gives the lowest value of the cost
   function (e.g. the lowest sum of the squared error), out of all possible $b$
@@ -799,7 +798,6 @@ variables*.
 For instance, let's say we take a completely arbitrary guess at the combination
 of parameter estimates, to see how the fitted values and error vector are
 generated, using two predictor variables:
-<!-- #endregion -->
 
 ```{python}
 # Arbitrary guesses for the slopes and intercept.
