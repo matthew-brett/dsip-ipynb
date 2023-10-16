@@ -2,11 +2,13 @@
 jupyter:
   jupytext:
     formats: ipynb,Rmd
+    notebook_metadata_filter: all,-language_info
+    split_at_heading: true
     text_representation:
       extension: .Rmd
       format_name: rmarkdown
       format_version: '1.2'
-      jupytext_version: 1.14.5
+      jupytext_version: 1.15.2
   kernelspec:
     display_name: Python 3 (ipykernel)
     language: python
@@ -76,7 +78,7 @@ dataset (to make it easier to visualise/think about the concepts):
 
 ```{python}
 # read in the data
-df = pd.read_csv("Duncan_Occupational_Prestige.csv")
+df = pd.read_csv("data/Duncan_Occupational_Prestige.csv")
 
 # restrict our attention to the first 15 rows
 df = df.head(15)
@@ -484,8 +486,8 @@ Let's compare these, once more, to the parameter estimates we get from `scipy.st
 sps.linregress(income, prestige)
 ```
 
-The graph below shows the best fitting line for the model `prestige` = $b$
-* `income + c + `  $\vec{\varepsilon}$
+The graph below shows the best fitting line for the model `prestige
+= b * income + c + `  $\vec{\varepsilon}$
 
 ```{python}
 # show the linear regression, predicting `prestige` from `income`

@@ -5,6 +5,7 @@ xlrd
 openpyxl
 scipy
 ipython
+ipywidgets
 jupytext
 sqlalchemy
 statsmodels
