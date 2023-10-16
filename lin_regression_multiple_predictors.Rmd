@@ -539,8 +539,8 @@ In most cases we will want a model where the fitted values take into account
 information from *both* predictor variables.
 
 You've already seen that it is possible to include multiple predictors in
-a linear regression model on the [multiple regression
-page](https://lisds.github.io/textbook/classification/Multiple_Regression.html)). 
+a linear regression model on the previous [multiple regression
+page](https://lisds.github.io/textbook/classification/Multiple_Regression.html). 
 
 In fact, the original model Duncan fit included both `education` and `income`
 as predictor variables - (and as mentioned previously, the parameter estimates
