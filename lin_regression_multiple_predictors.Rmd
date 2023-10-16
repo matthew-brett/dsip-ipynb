@@ -327,7 +327,7 @@ our `ss_any_line` function) is smaller for the best fitting line.
 Just now, and on the [regression notation
 page](https://nbviewer.org/github/pxr687/temp_page/blob/main/lin_regression_notation.ipynb)
 we used the `scipy.stats.linregress` function to quickly fit our regression.
-This essentially fits the model using a cost function this is internal to
+This essentially fits the model using a cost function that is internal to
 `scipy.stats.linregress` — we do not get to control the cost function.
 
 Let's refresh our memories on how to find the parameter estimates using a cost
