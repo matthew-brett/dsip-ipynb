@@ -361,12 +361,12 @@ min_ss.x
 
 ```{python}
 # compare the slope of the best-fitting line we got from scipy.stats.linregress
-print('linregress slope:', b_education)
+jupyprint(f'linregress slope:  {b_education}')
 ```
 
 ```{python}
 # compare the intercept of the best-fitting line we got from scipy.stats.linregress
-print('linregress intercept:', c_education)
+jupyprint(f'linregress intercept: {c_education}')
 ```
 
 Both of these approaches (using `scipy.stats.linregress` or using `minimize`
@@ -395,7 +395,8 @@ this notation:
   `education` is our $x$ vector and `prestige` is our $y$ vector).
 - We write a cost function (`ss_any_line`) which takes a value of $b$ and $c$
   and then returns the "cost" for those parameters, given our our $x$ and $y$
-  vectors. It does this by generating fitted values using $b$ and $c$,
+  vectors.
+  - It does this by generating fitted values using $b$ and $c$,
   subtracting these fitted values from the actual `prestige` scores to generate
   the error vector, and then squaring the values in the error vector and adding
   them up (to calculate the sum of squared error for this specific $b$ and $c$
@@ -486,8 +487,8 @@ Let's compare these, once more, to the parameter estimates we get from `scipy.st
 sps.linregress(income, prestige)
 ```
 
-The graph below shows the best fitting line for the model `prestige
-= b * income + c + `  $\vec{\varepsilon}$
+The graph below shows the best fitting line for the model `prestige`
+= $b *$ `income` + $c$ + $\vec{\varepsilon}$
 
 ```{python}
 # show the linear regression, predicting `prestige` from `income`
