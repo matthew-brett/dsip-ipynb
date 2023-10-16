@@ -500,11 +500,13 @@ errors_income = make_scatter(b = b_income,
                              show = True)
 ```
 
-# Expanding the model - multiple predictors
+## Expanding the model - multiple predictors
 
 So far we have fit two *separate* linear regression models.
 
-Each separate model is shown below, in vector form, with the actual data and error values in the relevant vectors, as well as the parameter estimates obtained from each linear regression:
+Each separate model is shown below, in vector form, with the actual data and
+error values in the relevant vectors, as well as the parameter estimates
+obtained from each linear regression:
 
 ```{python}
 # do not worry about this code, it just prints the mathematical notation below this cell
@@ -515,9 +517,15 @@ jupyprint("Here is the our model (`prestige` = $b * $ `income` + $ \\text{c} + \
 jupyprint(f"${arraytex(np.atleast_2d(prestige).T)} = {b_income.round(2)} * {arraytex(np.atleast_2d(income).T)} + {c_income.round(2)} + {arraytex(np.atleast_2d(errors_income.round(2)).T)}$")
 ```
 
-The fitted values from each separate linear regression are shown in the output of the cell below. You'll notice that the two models give different fitted values. You can think of each of these regressions as modelling the linear relationship between each predictor and the outcome variable if we **ignore** the other predictor.
+The fitted values from each separate linear regression are shown in the output
+of the cell below. You'll notice that the two models give different fitted
+values. You can think of each of these regressions as modeling the linear
+relationship between each predictor and the outcome variable if we **ignore**
+the other predictor.
 
-Generally, when exploring datasets and doing data science, we will be interested in more than one predictor. We may want to **take into account** another predictor when we get our parameter estimates.
+Generally, when exploring datasets and doing data science, we will be
+interested in more than one predictor. We may want to **take into account**
+another predictor when we get our parameter estimates.
 
 ```{python}
 jupyprint("Here are the fitted values $\hat{y}$ from the (`prestige` = $b * $ `education` + $ \\text{c} + \\vec{\\varepsilon} $) model:")
@@ -526,9 +534,12 @@ jupyprint("Here are the fitted values $\hat{y}$ from the (`prestige` = $b * $ `i
 jupyprint(f"${arraytex(np.atleast_2d(b_income* income + c_income).round(2).T)} = {b_income.round(2)} * {arraytex(np.atleast_2d(income).T)} + {c_income.round(2)}$")
 ```
 
-In most cases we will want a model where the fitted values take into account information from *both* predictor variables.
+In most cases we will want a model where the fitted values take into account
+information from *both* predictor variables.
 
-You've already seen that it is possible to include multiple predictors in a linear regression model on the [multiple regression page](https://lisds.github.io/textbook/classification/Multiple_Regression.html)). 
+You've already seen that it is possible to include multiple predictors in
+a linear regression model on the [multiple regression
+page](https://lisds.github.io/textbook/classification/Multiple_Regression.html)). 
 
 In fact, the original model Duncan fit included both `education` and `income` as predictor variables - (and as mentioned previously, the parameter estimates were calculated with a mechanical calculator, a labour which we will not subject you to!).
 
@@ -821,7 +832,7 @@ If you are using this page interactively, try using the sliders below to change 
 *Note*: it's best to change these parameters "slowly" e.g. take a deep note of how the vectors look with a certain parameter combination, and what the sum of the squared error is for that combination. Then change one parameter and see how it affects the error vector.
 
 ```{python}
-def interactive_notation(edu_slope_guess = 1, 
+def interactive_notation(edu_slope_guess = 1,
                          inc_slope_guess = 1,
                          intercept_guess = 1):
 
@@ -835,19 +846,24 @@ def interactive_notation(edu_slope_guess = 1,
     jupyprint("$\\vec{\\hat{y}} = b_1 * $ `education` + $b_2 * $ `income` +   $\\text{c} $")
     jupyprint(f"${arraytex(np.atleast_2d(fitted + errors).T)} = {round(edu_slope_guess, 2)} * {arraytex(np.atleast_2d(education).T)} + {round(inc_slope_guess, 2)} * {arraytex(np.atleast_2d(income).T)} + {round(intercept_guess, 2)} + {arraytex(np.atleast_2d(errors).round(2).T)}$")
     jupyprint(f"The sum of the squared errors for this combination of parameter estimates is <b> {round(np.sum(errors**2), 2)} </b>")
-    
+
 interact(interactive_notation, edu_slope_guess = (-1, 1, 0.1), inc_slope_guess = (-1, 1, 0.1), intercept_guess = (-10, 10, 0.1))
 ```
 
 So just to recap:
 
-- we are now using two predictor variables and two slopes to generate our fitted values
+- we are now using two predictor variables and two slopes to generate our
+  fitted values.
+- *Everything else in the fitting process is the same as for a single predictor model.*
 
-*Everything else in the fitting process is the same as for a single predictor model.*
+The value of the sum of the squared error depends on our particular combination
+of parameter estimates ($b_1, b_1, c $). We can use `minimize` to try lots of
+combinations in order to identify the combination which gives the smallest sum
+of the squared error.
 
-The value of the sum of the squared error depends on our particular combination of parameter estimates ($b_1, b_1, c $). We can use `minimize` to try lots of combinations in order to identify the combination which gives the smallest sum of the squared error.
-
-In order to do that, we need to modify our cost function so that it accepts two predictors, and generates fitted values which result from those two predictors, and two slopes:
+In order to do that, we need to modify our cost function so that it accepts two
+predictors, and generates fitted values which result from those two predictors,
+and two slopes:
 
 ```{python}
 # modify our sum of squares function to accept two predictors
