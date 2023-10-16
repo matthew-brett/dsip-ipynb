@@ -19,6 +19,8 @@ parts:
   chapters:
   - file: numpy_and_vectors
   - file: algebra_of_sums
+  - file: linear_regression_notation
+  - file: linear_regression_multiple_predictors
 - caption: Working with data
   chapters:
   - file: data_work
