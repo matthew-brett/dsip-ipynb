@@ -1314,11 +1314,15 @@ How good this estimate is depends on how well our regression plane fits the unde
 
 ### A quick note on the intercept
 
-The intercept is the point where the plane crosses the vertical axis (in our case the `prestige` axis) at the point where both the other axes (`education` and `income`) both equal 0. This is why the intercept is a single term, as there is only one point where this crossing occurs! If we didn't include an intercept then our plane would have to pass through the "origin" (e.g. 0 on all three axes) which would limit the number of planes we can fit. Including an intercept term let's us move the plane up and down the vertical axis when fitting it to the datapoints...
+The intercept is the point where the plane crosses the vertical axis (in our case the `prestige` axis) at the point where both the other axes (`education` and `income`) both equal 0. This is why the intercept is a single term, as there is only one point where this crossing occurs! If we didn't include an intercept then our plane would have to pass through the "origin" (e.g. 0 on all three axes) which would limit the number of planes we can fit. Including an intercept term let's us move the plane up and down the vertical axis when fitting it to the data points...
 
-The plot below let's you use some sliders to manipulate a plane by changing the values of the $x_1$ slope, the $x_2$ slope and the intercept. It also shows the origin (where all three axes == 0) as a black dot.
+The plot below let's you use some sliders to manipulate a plane by changing the
+values of the $x_1$ slope, the $x_2$ slope and the intercept. It also shows the
+origin (where all three axes == 0) as a black dot.
 
-*Note*: the axes are shown with values relevant to the dataset used on this page - the plane itself is technically infinite, it runs on infinitely outside of all the borders of the graph - a pretty cool concept!
+*Note*: the axes are shown with values relevant to the dataset used on this
+page - the plane itself is technically infinite, it runs on infinitely outside
+of all the borders of the graph - a pretty cool concept!
 
 ```{python}
 # do not worry about this code, it just generates the interactive plot below
@@ -1331,12 +1335,12 @@ def plane_interact(x1_slope, x2_slope, intercept):
     x1_for_plot, x2_for_plot = np.meshgrid(x1, x2)
 
     y_for_plot = x1_slope * x1_for_plot + x2_slope * x2_for_plot + intercept
-    
+
     ax.plot([0], [0], [0], marker='o', markersize=8, color='black', label='Origin (0,0,0)')
     ax.plot([0, 100], [0, 0], [0, 0], color = 'black', label = '$x_1$')
     ax.plot([0, 0], [0, 100], [0, 0], color = 'black', label = '$x_2$')
     ax.plot([0, 0], [0, 0], [0, 100], color = 'black', label = '$\hat{y}$')
-    
+
     ax.set_xlabel('$x_1$')
     ax.set_ylabel('$x_2$')
     ax.set_zlabel('$y$')
@@ -1347,6 +1351,7 @@ def plane_interact(x1_slope, x2_slope, intercept):
     plt.legend(loc = (1, 1))
 
     plt.show()
+
 
 interact(plane_interact, x1_slope = (-1, 1, 0.1), x2_slope = (-1, 1, 0.1), intercept = (-10, 10, 0.1))
 ```
