@@ -821,7 +821,7 @@ Remember the formula for the fitted values with a single predictor?:
 
 $\vec{\hat{y}} = b \vec{x} + \text{c}$
 
-Just as the formula for the model, this can be modified for two predictors:
+As mentioned above, just as the formula for the model, this can be modified for two predictors:
 
 $\vec{\hat{y}} = b_1 \vec{x_1} +  b_2\vec{x_2} + \text{c}$
 
@@ -920,7 +920,7 @@ def interactive_notation(edu_slope_guess=1,
 
     # do not worry about this code, it just prints the mathematical notation below this cell
     jupyprint("$\\vec{\\hat{y}} = b_1 * $ `education` + $b_2 * $ `income` +   $\\text{c} $")
-    jupyprint(f"${arraytex(np.atleast_2d(fitted + errors).T)} = {round(edu_slope_guess, 2)} * {arraytex(np.atleast_2d(education).T)} + {round(inc_slope_guess, 2)} * {arraytex(np.atleast_2d(income).T)} + {round(intercept_guess, 2)} + {arraytex(np.atleast_2d(errors).round(2).T)}$")
+    jupyprint(f"${arraytex(np.atleast_2d(fitted + errors).astype(int).T)} = {round(edu_slope_guess, 2)} * {arraytex(np.atleast_2d(education).T)} + {round(inc_slope_guess, 2)} * {arraytex(np.atleast_2d(income).T)} + {round(intercept_guess, 2)} + {arraytex(np.atleast_2d(errors).round(2).T)}$")
     jupyprint(f"The sum of the squared errors for this combination of parameter estimates is <b> {round(np.sum(errors**2), 2)} </b>")
 
 interact(interactive_notation, edu_slope_guess = (-1, 1, 0.1), inc_slope_guess = (-1, 1, 0.1), intercept_guess = (-10, 10, 0.1))
