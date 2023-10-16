@@ -1,0 +1,179 @@
+---
+jupyter:
+  jupytext:
+    notebook_metadata_filter: all,-language_info
+    split_at_heading: true
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.2'
+      jupytext_version: 1.15.2
+  kernelspec:
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
+---
+
+# Numpy, arrays, and vectors
+
+```{python}
+import numpy as np
+import pandas as pd
+pd.set_option('mode.copy_on_write', True)
+import matplotlib.pyplot as plt
+```
+
+```{python}
+top_15 = pd.read_csv('data/Duncan_Occupational_Prestige.csv').head(15)
+top_15
+```
+
+```{python}
+x = np.array(top_15['income'])
+x
+```
+
+```{python}
+y = np.array(top_15['prestige'])
+y
+```
+
+```{python}
+# Plot prestige (y) as a function of income (x).
+plt.scatter(x, y)
+```
+
+Let's guess a slope and intercept:
+
+```{python}
+plt.scatter(x, y)
+# Put 0, 0 on the plot.
+x_min, x_max, y_min, y_max = plt.axis()
+limits = [0, x_max, 0, y_max]
+plt.axis(limits);
+```
+
+```{python}
+# Our guesses.
+b = 0.7
+c = 30
+```
+
+```{python}
+# The fitted values
+y_hat = b * x + c
+```
+
+```{python}
+plt.scatter(x, y)
+plt.plot(x, y_hat, 'ro')
+# Put 0, 0 on the plot.
+plt.axis(limits);
+```
+
+Remember the notation:
+
+$$
+\vec{x} = [x_1, x_2, ... x_n]
+$$
+
+$$
+\vec{y} = [y_1, y_2, ... y_n]
+$$
+
+The 1D array `x` is Python's representation of $\vec{x}$, and `y` is $\vec{y}$.
+
+
+We calculate our fitted values $\hat{\vec{y}}$ as
+
+$$
+\hat{\vec{y}} = b \vec{x} + c
+$$
+
+$b$ and $c$ are a single values (scalars).
+
+Notice the notation above.  The notation assumes that, when we multiply a vector $\vec{x}$ by a scalar $b$, that has the effect of multiplying each *value* in $\vec{x}$ by the scalar $b$.
+
+The result of $b \vec{x}$ is another vector (we've called it $\hat{\vec{y}}$) that has values $[b x_1, b x_2, ..., b x_n]$.
+
+[Not coincidentally](https://www.nature.com/articles/s41586-020-2649-2), this is also what Numpy understands by mupltiplying the array by the scalar:
+
+```{python}
+bx = b * x
+bx
+```
+
+The same goes for addition.  When we add a scalar $c$ to a vector, that has the effect of adding the value $c$ to each value in the vector.   So $b \vec{x} + c$ is $[b x_1 + c, b x_2 + c, ..., b x_n + c]$.
+
+```{python}
+# Adds c to every value of bc
+bx + c
+```
+
+We find the same parallels between Numpy and mathematical notation for adding and subtracting vectors.
+
+Remember we write the calculation of the errors with:
+
+$$
+\vec{e} = \vec{y} - \hat{\vec{y}}
+$$
+
+That is $\hat{\vec{y}} = [y_1 - \hat{y_1}, y_2 - \hat{y_2}, ..., y_n
+- \hat{y_n}]$ 
+
+When we subtract (or add) two vectors, the result is the *element by element*
+subtraction of the values in the vectors.
+
+This is Numpy's idea as well.  This means we can write the mathematical
+formulation more or less directly in code:
+
+```{python}
+# Calculate e vector from y and y_hat
+e = y - y_hat
+e
+```
+
+## Arrays and lists
+
+You've learned that Numpy uses the standard mathematical logic for addition and
+multiplication of vectors.
+
+You may remember that Python Lists aren't designed for the same purpose, and they have a *different logic for addition and multiplication*.
+
+```{python}
+x_as_list = list(x)
+x_as_list
+```
+
+Adding a scalar to a list causes an error:
+
+```{python tags=c("raises-exception")}
+x_as_list + c
+```
+
+Multiplying a list by a scalar `p` *repeats* the list $p$ times:
+
+```{python}
+x_as_list * 3
+```
+
+Adding two lists concatenates the lists, giving a single list with the elements of the first list followed by the elements of the second:
+
+```{python}
+y_as_list = list(y)
+y_as_list
+```
+
+```{python}
+both = x_as_list + y_as_list
+both
+```
+
+```{python}
+len(both)
+```
+
+To repeat then — *Numpy* makes addition / subtraction and multiplication
+/ division work in the same way on arrays, as we expect from mathematics.  See
+[vector space](https://en.wikipedia.org/wiki/Vector_space) for the gory
+details.

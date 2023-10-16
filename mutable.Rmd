@@ -1,0 +1,108 @@
+---
+jupyter:
+  orphan: true
+  jupytext:
+    notebook_metadata_filter: all,-language_info
+    split_at_heading: true
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.2'
+      jupytext_version: 1.15.2
+  kernelspec:
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
+---
+
+# Mutable and immutable objects
+
+```{python}
+import numpy as np
+```
+
+There is a distinction in Python between container objects that are *mutable*
+and those that are *immutable*.
+
+Container objects are objects that contain a collection of other objects.
+
+One example of container object is a list:
+
+```{python}
+# A list.  Notice the square brackets.
+a = [1, 2, 3]
+```
+
+A list is *mutable*.  This means that we can change the values inside the list without having to make a new value.  For example:
+
+```{python}
+a[1] = 99
+a
+```
+
+Notice that `a` is the same *value* that we created in the first cell, but the
+contents of that value have changed — the second element is now 99.  The list
+is *mutable*.
+
+The *tuple* is another type of container object.  In many ways it is similar to a list, but, by contrast, tuples are *immutable* by design:
+
+```{python}
+# A tuple.  Notice the round brackets (parentheses).
+t = (1, 2, 3)
+t
+```
+
+Trying to set any value contained in the tuple raises an error:
+
+```{python tags=c("raises-exception")}
+t[1] = 99
+```
+
+## Examples of mutable and immutable containers
+
+* Immutable:
+    * Tuple (`tuple`)
+    * String (`str`)
+* Mutable:
+    * List (`list`)
+    * Dictionary (`dict`)
+    * Array (`np.array`)
+
+Strings are containers for characters — a string represents a sequence of
+characters.  They are immutable.
+
+```{python tags=c("raises-exception")}
+# Setting character in string raises error
+s = 'My string'
+s[1] = 'i'
+```
+
+However, dictionaries are mutable:
+
+```{python}
+wages = dict(Liverpool=160_868_000,
+             Everton=80_707_000,
+             Leeds=20_800_000)
+wages
+```
+
+We can change the keys and values contained in the dictionary:
+
+```{python}
+wages['Liverpool'] = 164_000_000
+# The original wages value has changed.
+wages
+```
+
+Arrays are mutable:
+
+```{python}
+arr = np.array([1, 2, 3])
+arr[0] = 99
+arr
+```
+
+## And this matters because?
+
+Actually, we can often forget about whether an object is mutable or not, but it
+does sometimes matter.

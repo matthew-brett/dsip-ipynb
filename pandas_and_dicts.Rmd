@@ -1,0 +1,196 @@
+---
+jupyter:
+  jupytext:
+    notebook_metadata_filter: all,-language_info
+    split_at_heading: true
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.2'
+      jupytext_version: 1.14.1
+  kernelspec:
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
+---
+
+# Pandas and dictionaries
+
+Dictionaries are everywhere in Pandas, if you but look a little deeper.
+
+Consider — where would it be useful to have something that associates a *name*
+(a key) with a value or sequence of values?
+
+And in fact - the idea of names mapping to values is fundamental to Pandas.
+
+```{python}
+import numpy as np
+import pandas as pd
+
+pd.set_option('mode.copy_on_write', True)
+
+import matplotlib.pyplot as plt
+```
+
+## Building data frames with arrays and lists
+
+Let us say you found yourself in the situation where you had a list of some
+English Premier League (EPL) teams outside London.  Maybe you have typed this
+in.  In any case, here it is:
+
+```{python}
+teams = [
+    'Wolverhampton Wanderers',
+    'Brighton and Hove Albion',
+    'Newcastle',
+    'Bournemouth',
+    'Nottingham Forest',
+    'Aston Villa',
+    'Everton'
+]
+```
+
+You also have the corresponding wage bills, from the [2022-2023 EPL
+wages](https://www.spotrac.com/epl/payroll/2022)
+
+```{python}
+wages = [
+    64_055_000,
+    15_679_600,
+    77_503_600,
+    43_836_000,
+    75_260_000,
+    86_060_000,
+    80_707_000
+]
+```
+
+And actually, you have the corresponding number of points at the end of the
+season, for each team, recorded from the [EPL league
+table](https://en.wikipedia.org/wiki/2022%E2%80%9323_Premier_League):
+
+```{python}
+points = [
+    41,
+    62,
+    71,
+    39,
+    38,
+    61,
+    36,
+]
+```
+We'd really like a data frame with these columns: 'Team', 'Wages', and 'Points'.
+
+Luckily our task is all but done for us, once we have made the `dict` (mapping) between the names and the values.
+
+```{python}
+ready_for_df = {
+    'Team': teams,
+    'Wages': wages,
+    'Points': points
+}
+ready_for_df
+```
+
+Enter `pd.DataFrame`.  As usual, investigate with shift-tab in the function name in Jupyter, but one good way of using that function is to pass a dictionary that names the columns, like this:
+
+```{python}
+epl = pd.DataFrame(ready_for_df)
+epl
+```
+
+We can't help it, let's have a look at the wages vs points for this very small sample.
+
+Remember the plot methods of the data frame.  These give us some nice features, including automatic labels.
+
+```{python}
+epl.plot.scatter(x='Wages', y='Points')
+```
+
+What is another mapping we might want?
+
+Well - what if we don't like the column names of our current data frame?   We want to *map* from the *current* column name, to the *new* column name.  The mapping might look like this:
+
+```{python}
+renames = {'Team': 'Team name',
+           'Wages': 'Estimated wages for year in £'}
+renames
+```
+
+We can use the `rename` method of the data frame to apply this mapping:
+
+```{python}
+fancier_epl = epl.rename(columns=renames)
+fancier_epl
+```
+
+Notice we have just renamed the columns in the mapping.
+
+
+Let's construct a dictionary from scratch with the team names and the wages:
+
+```{python}
+team_wages = {}
+for i in range(len(teams)):
+    team_wages[teams[i]] = wages[i]
+team_wages
+```
+
+Remember that a dict has a default sequence that it gives you, if asked, and that is the keys:
+
+```{python}
+# We ask for a sequence from the keys
+list(team_wages.keys())
+```
+
+The default sequence is the keys:
+
+```{python}
+list(team_wages)
+```
+
+Pandas data frames also have a default sequence that it gives if asked, and these are the column names:
+
+```{python}
+list(fancier_epl)
+```
+
+Can you think of another mapping in Pandas?   How about the labels for the rows?
+
+```{python}
+# Map from the label 3 to the row with that label
+fancier_epl.loc[3]
+```
+
+We can make that more obvious by putting text labels on the data frame:
+
+```{python}
+labeled_epl = fancier_epl.set_index('Team name')
+labeled_epl
+```
+
+```{python}
+# Map from label Bournemouth to the matching row.
+labeled_epl.loc['Bournemouth']
+```
+
+The mapping is particularly obvious when we have a Series:
+
+```{python}
+wage_series = labeled_epl['Estimated wages for year in £']
+wage_series
+```
+
+The series is very dict-ey, because the labels map to values.   In fact, it is so dict-ey, that the series has a `to_dict` method to give you the equivalent dict:
+
+```{python}
+wages_as_dict = wage_series.to_dict()
+wages_as_dict
+```
+
+You can map straight back to a series with the `pd.Series` constructor:
+
+```{python}
+pd.Series(wages_as_dict)
+```

@@ -8,12 +8,19 @@ parts:
   chapters:
   - file: assert
   - file: arrays_and_images
+  - file: where_and_argmin
+  - file: where_2d
+  - file: image_for_optimize
   - file: pathlib
-  - file: lambda_functions
   - file: dictionaries
+  - file: pandas_and_dicts
+  - file: lambda_functions
 - caption: Reading formulae
   chapters:
+  - file: numpy_and_vectors
   - file: algebra_of_sums
+  - file: lin_regression_notation
+  - file: lin_regression_multiple_predictors
 - caption: Working with data
   chapters:
   - file: data_work
