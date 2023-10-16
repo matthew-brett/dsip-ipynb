@@ -1038,6 +1038,10 @@ We modified our cost function so that it uses fitted values ($\hat{y}$) which ar
 
 $\vec{\hat{y}} = b_1 * $ `education` + $b_2 * $ `income` +   $\text{c} $
 
+Which can be shown with the mathematical notation for the individual values within the vectors:
+
+$\begin{bmatrix}{} \text{$\hat{y_{1}}$} \\ \text{$\hat{y_{2}}$} \\ \text{$\hat{y_{3}}$} \\ \text{$\hat{y_{4}}$} \\ \text{$\hat{y_{5}}$} \\ \text{$\hat{y_{6}}$} \\ \text{$\hat{y_{7}}$} \\ \text{$\hat{y_{8}}$} \\ \text{$\hat{y_{9}}$} \\ \text{$\hat{y_{10}}$} \\ \text{$\hat{y_{11}}$} \\ \text{$\hat{y_{12}}$} \\ \text{$\hat{y_{13}}$} \\ \text{$\hat{y_{14}}$} \\ \text{$\hat{y_{15}}$} \\ \end{bmatrix} = b_1 * \begin{bmatrix}{} \text{$x_{1_1}$} \\ \text{$x_{1_2}$} \\ \text{$x_{1_3}$} \\ \text{$x_{1_4}$} \\ \text{$x_{1_5}$} \\ \text{$x_{1_6}$} \\ \text{$x_{1_7}$} \\ \text{$x_{1_8}$} \\ \text{$x_{1_9}$} \\ \text{$x_{1_{10}}$} \\ \text{$x_{1_{11}}$} \\ \text{$x_{1_{12}}$} \\ \text{$x_{1_{13}}$} \\ \text{$x_{1_{14}}$} \\ \text{$x_{1_{15}}$} \\ \end{bmatrix} + b_2 *  \begin{bmatrix}{} \text{$x_{2_{1}}$} \\ \text{$x_{2_{2}}$} \\ \text{$x_{2_{3}}$} \\ \text{$x_{2_{4}}$} \\ \text{$x_{2_{5}}$} \\ \text{$x_{2_{6}}$} \\ \text{$x_{2_{7}}$} \\ \text{$x_{2_{8}}$} \\ \text{$x_{2_{9}}$} \\ \text{$x_{2_{10}}$} \\ \text{$x_{2_{11}}$} \\ \text{$x_{2_{12}}$} \\ \text{$x_{2_{13}}$} \\ \text{$x_{2_{14}}$} \\ \text{$x_{2_{15}}$} \\ \end{bmatrix}  +c $
+
 We then used `minimize` to find the combination of slopes and intercepts ($b_1, b_2, c$) which gives the lowest sum of the squared error, out of any combination.
 
 The model is shown below, with the best-fitting parameter estimates ($b_1, b_2, c$), as well as the `prestige`, `education` and `income` vectors, and the error vector $\vec{\varepsilon}$.
