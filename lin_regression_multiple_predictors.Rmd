@@ -1176,7 +1176,11 @@ Let's try some arbitrary slope/intercept combinations, so we can see what it loo
 
 If you are using this page interactively, use the sliders below to try some combinations for the slopes and intercept, so you can see how they affect the plane and how it fits the data.
 
-The vector notation for the model, along with your custom parameter estimates and the resultant sum of the squared errors, are shown beneath the scatter plot:
+The vector notation for the model, along with your custom parameter estimates and the resultant sum of the squared errors, are shown beneath the scatter plot.
+
+* The first slider controls the size of the `education` slope $b_1$
+* The second slider controls the size of the `income` slope $b_2$
+* The third slider controls the size of the `intercept`
 
 ```{python}
 def interactive_plane_fitter(education_slope, income_slope, intercept):
@@ -1233,6 +1237,8 @@ Again, as you look at the 3D scatterplot, imagine it as a physical object.
 
 Imagine you are standing in front of the `education` axis, where the axis label is, looking towards the "back wall" of the graph. 
 
+![](images/look_ed_axis.png)
+
 The edge of the plane would appear to you as a line, and assuming you were the right height, you would see something like this:
 
 ```{python}
@@ -1264,6 +1270,8 @@ plot_model_3D(x1_slope = 0,
 ```
 
 Now imagine you are standing in front of the `income` axis, where the axis label is, looking towards the "left wall" of the graph. 
+
+![](images/look_inc_axis.png)
 
 Again, the edge of the plane would appear to you as a line, and assuming you were the right height, you would see something like this:
 
