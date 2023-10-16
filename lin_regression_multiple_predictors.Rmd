@@ -8,7 +8,7 @@ jupyter:
       extension: .Rmd
       format_name: rmarkdown
       format_version: '1.2'
-      jupytext_version: 1.15.2
+      jupytext_version: 1.14.5
   kernelspec:
     display_name: Python 3 (ipykernel)
     language: python
@@ -23,7 +23,7 @@ seen for [linear regression models with a single
 predictor](lin_regression_notation).
  
 We will add the same caveat as before: this page will most likely be
-challenging if you a new to this, so please do not worry if you do not
+challenging if you are new to this, so please do not worry if you do not
 understand some concepts the first time you read them.
 
 But do keep reading, and re-reading.  You'll get there.
@@ -327,7 +327,7 @@ our `ss_any_line` function) is smaller for the best fitting line.
 Just now, and on the [regression notation
 page](https://nbviewer.org/github/pxr687/temp_page/blob/main/lin_regression_notation.ipynb)
 we used the `scipy.stats.linregress` function to quickly fit our regression.
-This essentially fits the model using a cost function this is internal to
+This essentially fits the model using a cost function that is internal to
 `scipy.stats.linregress` — we do not get to control the cost function.
 
 Let's refresh our memories on how to find the parameter estimates using a cost
@@ -361,12 +361,12 @@ min_ss.x
 
 ```{python}
 # compare the slope of the best-fitting line we got from scipy.stats.linregress
-print('linregress slope:', b_education)
+jupyprint(f'linregress slope:  {b_education}')
 ```
 
 ```{python}
 # compare the intercept of the best-fitting line we got from scipy.stats.linregress
-print('linregress intercept:', c_education)
+jupyprint(f'linregress intercept: {c_education}')
 ```
 
 Both of these approaches (using `scipy.stats.linregress` or using `minimize`
@@ -395,7 +395,8 @@ this notation:
   `education` is our $x$ vector and `prestige` is our $y$ vector).
 - We write a cost function (`ss_any_line`) which takes a value of $b$ and $c$
   and then returns the "cost" for those parameters, given our our $x$ and $y$
-  vectors. It does this by generating fitted values using $b$ and $c$,
+  vectors.
+  - It does this by generating fitted values using $b$ and $c$,
   subtracting these fitted values from the actual `prestige` scores to generate
   the error vector, and then squaring the values in the error vector and adding
   them up (to calculate the sum of squared error for this specific $b$ and $c$
@@ -486,8 +487,8 @@ Let's compare these, once more, to the parameter estimates we get from `scipy.st
 sps.linregress(income, prestige)
 ```
 
-The graph below shows the best fitting line for the model `prestige
-= b * income + c + `  $\vec{\varepsilon}$
+The graph below shows the best fitting line for the model `prestige`
+= $b *$ `income` + $c$ + $\vec{\varepsilon}$
 
 ```{python}
 # show the linear regression, predicting `prestige` from `income`
@@ -538,8 +539,8 @@ In most cases we will want a model where the fitted values take into account
 information from *both* predictor variables.
 
 You've already seen that it is possible to include multiple predictors in
-a linear regression model on the [multiple regression
-page](https://lisds.github.io/textbook/classification/Multiple_Regression.html)). 
+a linear regression model on the previous [multiple regression
+page](https://lisds.github.io/textbook/classification/Multiple_Regression.html). 
 
 In fact, the original model Duncan fit included both `education` and `income`
 as predictor variables - (and as mentioned previously, the parameter estimates
@@ -603,7 +604,7 @@ Where in our case:
 However, if we include extra predictors (three, or four, or five...) then we
 will have to use new symbols for each one, which will get cumbersome.
 
-<!-- #region -->
+
 Instead we add a subscript to the mathematical notation for each predictor
 variable, like this:
 
@@ -654,7 +655,7 @@ our case $n = 15$, as there are 15 observations. So we can also write the final
 value in each vector as:
 
 * $\Large x_{1_n}$ is the *final* value from $ \Large \vec{x_1}$, which in this case has 15 values, so can also be written as $ \Large x_{1_{15}}$
-<!-- #endregion -->
+
 
 Now we can refer to our `education` as our $x_1$ vector and `income` as our
 $x_2$ vector, the whole model, with both predictors, in mathematical notations
@@ -757,7 +758,6 @@ def ss_any_line(b_and_c, x_vector, y_vector):
     return np.sum(error ** 2)
 ```
 
-<!-- #region -->
 - We then pass our cost function to `minimize` and it tries multiple $b$ and $c$
   pairs until it finds the pair that gives the lowest value of the cost
   function (e.g. the lowest sum of the squared error), out of all possible $b$
@@ -799,7 +799,6 @@ variables*.
 For instance, let's say we take a completely arbitrary guess at the combination
 of parameter estimates, to see how the fitted values and error vector are
 generated, using two predictor variables:
-<!-- #endregion -->
 
 ```{python}
 # Arbitrary guesses for the slopes and intercept.
@@ -822,7 +821,7 @@ Remember the formula for the fitted values with a single predictor?:
 
 $\vec{\hat{y}} = b \vec{x} + \text{c}$
 
-Just as the formula for the model, this can be modified for two predictors:
+As mentioned above, just as the formula for the model, this can be modified for two predictors:
 
 $\vec{\hat{y}} = b_1 \vec{x_1} +  b_2\vec{x_2} + \text{c}$
 
@@ -921,7 +920,7 @@ def interactive_notation(edu_slope_guess=1,
 
     # do not worry about this code, it just prints the mathematical notation below this cell
     jupyprint("$\\vec{\\hat{y}} = b_1 * $ `education` + $b_2 * $ `income` +   $\\text{c} $")
-    jupyprint(f"${arraytex(np.atleast_2d(fitted + errors).T)} = {round(edu_slope_guess, 2)} * {arraytex(np.atleast_2d(education).T)} + {round(inc_slope_guess, 2)} * {arraytex(np.atleast_2d(income).T)} + {round(intercept_guess, 2)} + {arraytex(np.atleast_2d(errors).round(2).T)}$")
+    jupyprint(f"${arraytex(np.atleast_2d(fitted + errors).astype(int).T)} = {round(edu_slope_guess, 2)} * {arraytex(np.atleast_2d(education).T)} + {round(inc_slope_guess, 2)} * {arraytex(np.atleast_2d(income).T)} + {round(intercept_guess, 2)} + {arraytex(np.atleast_2d(errors).round(2).T)}$")
     jupyprint(f"The sum of the squared errors for this combination of parameter estimates is <b> {round(np.sum(errors**2), 2)} </b>")
 
 interact(interactive_notation, edu_slope_guess = (-1, 1, 0.1), inc_slope_guess = (-1, 1, 0.1), intercept_guess = (-10, 10, 0.1))
@@ -1033,11 +1032,15 @@ The mathematical notation for this is:
 
 $ \vec{y} = b_1 \vec{x_1} + b_2 \vec{x_2} + \text{c} + \vec{\varepsilon} $
 
-$\begin{bmatrix}{} \text{$y_{1}$} \\ \text{$y_{2}$} \\ \text{$y_{3}$} \\ \text{$y_{4}$} \\ \text{$y_{5}$} \\ \text{$y_{6}$} \\ \text{$y_{7}$} \\ \text{$y_{8}$} \\ \text{$y_{9}$} \\ \text{$y_{10}$} \\ \text{$y_{11}$} \\ \text{$y_{12}$} \\ \text{$y_{13}$} \\ \text{$y_{14}$} \\ \text{$y_{15}$} \\ \end{bmatrix} = b_1 * \begin{bmatrix}{} \text{$x_{11}$} \\ \text{$x_{12}$} \\ \text{$x_{13}$} \\ \text{$x_{14}$} \\ \text{$x_{15}$} \\ \text{$x_{16}$} \\ \text{$x_{17}$} \\ \text{$x_{18}$} \\ \text{$x_{19}$} \\ \text{$x_{110}$} \\ \text{$x_{111}$} \\ \text{$x_{112}$} \\ \text{$x_{113}$} \\ \text{$x_{114}$} \\ \text{$x_{115}$} \\ \end{bmatrix} + b_2 *  \begin{bmatrix}{} \text{$x_{21}$} \\ \text{$x_{22}$} \\ \text{$x_{23}$} \\ \text{$x_{24}$} \\ \text{$x_{25}$} \\ \text{$x_{26}$} \\ \text{$x_{27}$} \\ \text{$x_{28}$} \\ \text{$x_{29}$} \\ \text{$x_{210}$} \\ \text{$x_{211}$} \\ \text{$x_{212}$} \\ \text{$x_{213}$} \\ \text{$x_{214}$} \\ \text{$x_{215}$} \\ \end{bmatrix}  +c + \begin{bmatrix}{} \text{$\varepsilon_{1}$} \\ \text{$\varepsilon_{2}$} \\ \text{$\varepsilon_{3}$} \\ \text{$\varepsilon_{4}$} \\ \text{$\varepsilon_{5}$} \\ \text{$\varepsilon_{6}$} \\ \text{$\varepsilon_{7}$} \\ \text{$\varepsilon_{8}$} \\ \text{$\varepsilon_{9}$} \\ \text{$\varepsilon_{10}$} \\ \text{$\varepsilon_{11}$} \\ \text{$\varepsilon_{12}$} \\ \text{$\varepsilon_{13}$} \\ \text{$\varepsilon_{14}$} \\ \text{$\varepsilon_{15}$} \\ \end{bmatrix}$
+$\begin{bmatrix}{} \text{$y_{1}$} \\ \text{$y_{2}$} \\ \text{$y_{3}$} \\ \text{$y_{4}$} \\ \text{$y_{5}$} \\ \text{$y_{6}$} \\ \text{$y_{7}$} \\ \text{$y_{8}$} \\ \text{$y_{9}$} \\ \text{$y_{10}$} \\ \text{$y_{11}$} \\ \text{$y_{12}$} \\ \text{$y_{13}$} \\ \text{$y_{14}$} \\ \text{$y_{15}$} \\ \end{bmatrix} = b_1 * \begin{bmatrix}{} \text{$x_{1_1}$} \\ \text{$x_{1_2}$} \\ \text{$x_{1_3}$} \\ \text{$x_{1_4}$} \\ \text{$x_{1_5}$} \\ \text{$x_{1_6}$} \\ \text{$x_{1_7}$} \\ \text{$x_{1_8}$} \\ \text{$x_{1_9}$} \\ \text{$x_{1_{10}}$} \\ \text{$x_{1_{11}}$} \\ \text{$x_{1_{12}}$} \\ \text{$x_{1_{13}}$} \\ \text{$x_{1_{14}}$} \\ \text{$x_{1_{15}}$} \\ \end{bmatrix} + b_2 *  \begin{bmatrix}{} \text{$x_{2_{1}}$} \\ \text{$x_{2_{2}}$} \\ \text{$x_{2_{3}}$} \\ \text{$x_{2_{4}}$} \\ \text{$x_{2_{5}}$} \\ \text{$x_{2_{6}}$} \\ \text{$x_{2_{7}}$} \\ \text{$x_{2_{8}}$} \\ \text{$x_{2_{9}}$} \\ \text{$x_{2_{10}}$} \\ \text{$x_{2_{11}}$} \\ \text{$x_{2_{12}}$} \\ \text{$x_{2_{13}}$} \\ \text{$x_{2_{14}}$} \\ \text{$x_{2_{15}}$} \\ \end{bmatrix}  +c + \begin{bmatrix}{} \text{$\varepsilon_{1}$} \\ \text{$\varepsilon_{2}$} \\ \text{$\varepsilon_{3}$} \\ \text{$\varepsilon_{4}$} \\ \text{$\varepsilon_{5}$} \\ \text{$\varepsilon_{6}$} \\ \text{$\varepsilon_{7}$} \\ \text{$\varepsilon_{8}$} \\ \text{$\varepsilon_{9}$} \\ \text{$\varepsilon_{10}$} \\ \text{$\varepsilon_{11}$} \\ \text{$\varepsilon_{12}$} \\ \text{$\varepsilon_{13}$} \\ \text{$\varepsilon_{14}$} \\ \text{$\varepsilon_{15}$} \\ \end{bmatrix}$
 
 We modified our cost function so that it uses fitted values ($\hat{y}$) which are generated using two slopes and two predictor variables:
 
 $\vec{\hat{y}} = b_1 * $ `education` + $b_2 * $ `income` +   $\text{c} $
+
+Which can be shown with the mathematical notation for the individual values within the vectors:
+
+$\begin{bmatrix}{} \text{$\hat{y_{1}}$} \\ \text{$\hat{y_{2}}$} \\ \text{$\hat{y_{3}}$} \\ \text{$\hat{y_{4}}$} \\ \text{$\hat{y_{5}}$} \\ \text{$\hat{y_{6}}$} \\ \text{$\hat{y_{7}}$} \\ \text{$\hat{y_{8}}$} \\ \text{$\hat{y_{9}}$} \\ \text{$\hat{y_{10}}$} \\ \text{$\hat{y_{11}}$} \\ \text{$\hat{y_{12}}$} \\ \text{$\hat{y_{13}}$} \\ \text{$\hat{y_{14}}$} \\ \text{$\hat{y_{15}}$} \\ \end{bmatrix} = b_1 * \begin{bmatrix}{} \text{$x_{1_1}$} \\ \text{$x_{1_2}$} \\ \text{$x_{1_3}$} \\ \text{$x_{1_4}$} \\ \text{$x_{1_5}$} \\ \text{$x_{1_6}$} \\ \text{$x_{1_7}$} \\ \text{$x_{1_8}$} \\ \text{$x_{1_9}$} \\ \text{$x_{1_{10}}$} \\ \text{$x_{1_{11}}$} \\ \text{$x_{1_{12}}$} \\ \text{$x_{1_{13}}$} \\ \text{$x_{1_{14}}$} \\ \text{$x_{1_{15}}$} \\ \end{bmatrix} + b_2 *  \begin{bmatrix}{} \text{$x_{2_{1}}$} \\ \text{$x_{2_{2}}$} \\ \text{$x_{2_{3}}$} \\ \text{$x_{2_{4}}$} \\ \text{$x_{2_{5}}$} \\ \text{$x_{2_{6}}$} \\ \text{$x_{2_{7}}$} \\ \text{$x_{2_{8}}$} \\ \text{$x_{2_{9}}$} \\ \text{$x_{2_{10}}$} \\ \text{$x_{2_{11}}$} \\ \text{$x_{2_{12}}$} \\ \text{$x_{2_{13}}$} \\ \text{$x_{2_{14}}$} \\ \text{$x_{2_{15}}$} \\ \end{bmatrix}  +c $
 
 We then used `minimize` to find the combination of slopes and intercepts ($b_1, b_2, c$) which gives the lowest sum of the squared error, out of any combination.
 
@@ -1173,7 +1176,11 @@ Let's try some arbitrary slope/intercept combinations, so we can see what it loo
 
 If you are using this page interactively, use the sliders below to try some combinations for the slopes and intercept, so you can see how they affect the plane and how it fits the data.
 
-The vector notation for the model, along with your custom parameter estimates and the resultant sum of the squared errors, are shown beneath the scatter plot:
+The vector notation for the model, along with your custom parameter estimates and the resultant sum of the squared errors, are shown beneath the scatter plot.
+
+* The first slider controls the size of the `education` slope $b_1$
+* The second slider controls the size of the `income` slope $b_2$
+* The third slider controls the size of the `intercept`
 
 ```{python}
 def interactive_plane_fitter(education_slope, income_slope, intercept):
@@ -1230,6 +1237,8 @@ Again, as you look at the 3D scatterplot, imagine it as a physical object.
 
 Imagine you are standing in front of the `education` axis, where the axis label is, looking towards the "back wall" of the graph. 
 
+![](images/look_ed_axis.png)
+
 The edge of the plane would appear to you as a line, and assuming you were the right height, you would see something like this:
 
 ```{python}
@@ -1261,6 +1270,8 @@ plot_model_3D(x1_slope = 0,
 ```
 
 Now imagine you are standing in front of the `income` axis, where the axis label is, looking towards the "left wall" of the graph. 
+
+![](images/look_inc_axis.png)
 
 Again, the edge of the plane would appear to you as a line, and assuming you were the right height, you would see something like this:
 
