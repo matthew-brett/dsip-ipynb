@@ -1049,7 +1049,7 @@ jupyprint(f"${arraytex(np.atleast_2d(prestige).T)} = {round(education_slope_two_
 ```
 
 ```{python}
-# just for comparision
+# just for comparison
 df[['prestige', 'education', 'income']]
 ```
 
@@ -1202,7 +1202,7 @@ Let's recap how we fit this plane to the data, in a model with two predictors (m
 - our $x_1$, $x_2$ and $y$ vectors are fixed, they are given by our dataset (in our case `education` is our $x_1$ vector, `income` is our $x_1$ vector, and `prestige` is our $y$ vector)
 - we write a cost function (`ss_any_line`) which takes a value of $b_1$, $b_2$ and $c$ and then returns the "cost" for those parameters, given our our $x_1$, $x_2$ and $y$ vectors. 
     - Specifically, our cost function does this by generating fitted values using $b_1$, $b_2$ and $c$, subtracting these fitted values from the actual `prestige` scores to generate the error vector. The values in the error vector are then squared and added up (to calculate the sum of squared error for this specific $b_1$, $b_2$ and $c$ combination)
-- we pass our cost function to `minimize` and it tries multipe $b_1$, $b_2$ and $c$ combinations until it finds the combination that gives the lowest value of the cost function, out of all possible $b_1$, $b_2$ and $c$ combinations
+- we pass our cost function to `minimize` and it tries multiple $b_1$, $b_2$ and $c$ combinations until it finds the combination that gives the lowest value of the cost function, out of all possible $b_1$, $b_2$ and $c$ combinations
 
 
 # How does this compare to linear regression with one predictor?
