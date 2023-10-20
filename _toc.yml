@@ -21,6 +21,7 @@ parts:
   - file: algebra_of_sums
   - file: lin_regression_notation
   - file: lin_regression_multiple_predictors
+  - file: epl_modeling
 - caption: Working with data
   chapters:
   - file: data_work

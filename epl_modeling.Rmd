@@ -12,10 +12,9 @@ jupyter:
     display_name: Python 3 (ipykernel)
     language: python
     name: python3
-  orphan: true
 ---
 
-# Attack or defense?
+# Attack or defense?  An example of multiple regression
 
 What should you pay for, if you want to win the English Premier League?
 
@@ -327,4 +326,6 @@ Now we look to see if the `forward` spending can predict what is left over, afte
 smf.ols('without_defense ~ forward', data=df).fit().summary()
 ```
 
-It appears that this two-stage procedure gives a similar result to the one we saw before — once we have accounted for spending on defense, spending on forwards is no longer important, in these models.
+It appears that this two-stage procedure gives a similar result to the one we
+saw before — once we have accounted for spending on defense, spending on
+forwards is no longer important, in these models.
