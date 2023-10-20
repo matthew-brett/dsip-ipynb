@@ -54,7 +54,7 @@ individual spends on the keeper, defense, midfield and forwards.
 
 There are 20 EPL teams.
 
-```{python}o
+```{python}
 len(df)
 ```
 
