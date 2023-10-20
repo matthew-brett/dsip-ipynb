@@ -1,6 +1,5 @@
 ---
 jupyter:
-  orphan: true
   jupytext:
     notebook_metadata_filter: all,-language_info
     split_at_heading: true
@@ -13,22 +12,319 @@ jupyter:
     display_name: Python 3 (ipykernel)
     language: python
     name: python3
+  orphan: true
 ---
+
+# Attack or defense?
+
+What should you pay for, if you want to win the English Premier League?
 
 ```{python}
 import numpy as np
 import pandas as pd
 pd.set_option('mode.copy_on_write', True)
 import matplotlib.pyplot as plt
+
+# Show arrays without exponential notation, 6 digits of precision.
+np.set_printoptions(suppress=True, precision=6)
 ```
 
 ```{python}
+# For minimize.
 import scipy.optimize as spo
+# For linregress
 import scipy.stats as sps
+# For running statistical models.
 import statsmodels.formula.api as smf
 ```
+
+We load the data on wage spends in the 2021-2022 English Premier League (EPL).
+
+See [the EPL dataset
+page](https://github.com/odsti/datasets/tree/main/premier_league) for more
+details.
 
 ```{python}
 df = pd.read_csv('data/premier_league_2021.csv')
 df.head()
 ```
+
+Notice that we have the total yearly wage bill for each team, as well as the
+individual spends on the keeper, defense, midfield and forwards.
+
+There are 20 EPL teams.
+
+```{python}o
+len(df)
+```
+
+The data frame describe method gives useful statistics for all the numerical
+columns.
+
+```{python}
+df.describe()
+```
+
+Notice mean (and sum) `goal_difference` is 0.  This must be so, because every
+goal counts 1 positive for the scoring team, and 1 negative for the other team.
+
+The shape attribute of the data frame gives the number of rows and the number
+of columns.
+
+```{python}
+df.shape
+```
+
+We are interested in whether the wage spend can predict the goal difference.
+Maybe if you pay more, you score more goals and keep more goals out.
+
+```{python}
+df.plot.scatter(x='wages_year', y='goal_difference')
+# We show the y-axis so we can estimate the intercept.
+plt.xlim(0, 300000)
+```
+
+We want a best-fit line to these data.
+
+We can use a cost-function to tell use the quality of the line.  Low cost corresponds to a good line.
+
+We use the usual sum-of-squared errors as the cost.
+
+```{python}
+def sse_cost(params, x, y):
+    """ Sum of squared error cost function
+    """
+    b, c = params
+    y_hat = b * x + c
+    errors = y - y_hat
+    return np.sum(errors ** 2)
+```
+
+Here are some estimates for the intercept and slope, by eye-balling the graph.
+
+```{python}
+guessed_intercept = -40
+# Goal difference increases by about 20 for a £50,000 increase in spend.
+# Slope is rise (in y) divided by run (over x).
+guessed_slope = 20 / 50000
+guessed_slope
+```
+
+We use minimize and the `'powell'` method to find the values for slope and intercept (`params`) that give the lowest values for the cost function.
+
+```{python}
+res = spo.minimize(sse_cost, [guessed_intercept, guessed_slope],
+                   method='powell',
+                   args=(df['wages_year'], df['goal_difference']))
+res
+```
+
+These are the parameters (the slope and the intercept):
+
+```{python}
+res.x
+```
+
+If we run `linregress`, this uses the mathematics of sum-of-squares to get the
+minimizing slope and intercept.
+
+```{python}
+lr_res = sps.linregress(df['wages_year'], df['goal_difference'])
+lr_res
+```
+
+We suspect that `minimize` was less accurate than `sps.linregress`; the very
+small slope may mean that `minimize` gives up searching for the exact correct
+slope when it has got very close.
+
+Here's the cost function value from the parameters from `minimize`.
+
+```{python}
+sse_cost(res.x, df['wages_year'], df['goal_difference'])
+```
+
+The parameters from `sps.linregress` are slightly better — they give a somewhat lower value for the cost function.
+
+```{python}
+sse_cost([lr_res.slope, lr_res.intercept], df['wages_year'], df['goal_difference'])
+```
+
+In data science practice, we often use these least-squares cost functions, and we can use convenient libraries for these calculations.  `statsmodels` is a useful library for these general models.
+
+Using `statsmodels`, we first create a *model*, that encodes the relationship
+we're investigating, along with the data.
+
+```{python}
+sm_model = smf.ols('goal_difference ~ wages_year', data=df)
+sm_model
+```
+
+Once we have specified this model, we can use the `.fit` method of the new
+model to calculate the least-squares parameters.
+
+```{python}
+sm_fit = sm_model.fit()
+sm_fit
+```
+
+Finally, we can use the `.summary` method of the fit result, to show a detailed
+display of the parameters and other calculations from the fit.
+
+```{python}
+sm_fit.summary()
+```
+
+## Defense or attack?
+
+Here's a reminder of the columns of data we have.
+
+```{python}
+df.head()
+```
+
+Our question now is — should we spend on defense, or spend on attack (forwards)?
+
+Here's the plot of defense spending as a function of goal difference.
+
+```{python}
+df.plot.scatter(x='defense', y='goal_difference')
+```
+
+And the relationship of `forward` spending and goal difference.
+
+```{python}
+df.plot.scatter(x='forward', y='goal_difference')
+```
+
+Notice that both, on their own, have strongly positive relationships.
+
+Here we put both on the same plot.
+
+```{python}
+plt.scatter(df['forward'], df['goal_difference'], label='Forward')
+plt.scatter(df['defense'], df['goal_difference'], label='Defense')
+plt.legend()
+```
+
+Here we calculate the simple regression models for each.  Notice the chained
+execution for calculating the model, then the fit, and then the summary.
+
+```{python}
+smf.ols('goal_difference ~ defense', data=df).fit().summary()
+```
+
+```{python}
+smf.ols('goal_difference ~ forward', data=df).fit().summary()
+```
+
+Now we are interesting in taking *both* defense and forward spending into account *at the same time*.
+
+This is *multiple* regression.
+
+Notice that in multiple regression, we calculate the fitted $\hat{\vec{y}}$ values by adding to together the components due to the first predictor, and that due to the second predictor, and the intercept.
+
+```{python}
+def sse_multi(params, X, y):
+    """ Multiple regression sum of squared error
+
+    Parameters
+    ----------
+    params : slopes and intercept
+    X : array
+        2D array of predictor columns.
+    y : array
+        1D array of outcome vector.
+
+    Returns
+    -------
+    cfv : float
+        Cost function value
+    """
+    n, p = X.shape
+    y_hat = np.zeros(n)
+    for col_no in range(p):  # Go through each column.
+        col = X[:, col_no]  # Get the relevant column from X
+        fit_for_this_col = col * params[col_no]  # Multiply by corresponding parameter
+        y_hat = y_hat + fit_for_this_col
+    y_hat = y_hat + params[-1]  # Add the intercept
+    errors = y - y_hat
+    return np.sum(errors ** 2)
+```
+
+We compile the 2D array containing the two predictor columns, by taking two columns out of the data frame, and converting to an array.
+
+```{python}
+X = np.array(df[['defense', 'forward']])
+X
+```
+
+Next we use `minimize` to find the *three* parameters that minimize the cost
+function.  We found that both `powell` and the default methods gave warnings about failing to reach good results, so we tried the `nelder-mead` method.
+
+```{python}
+min_res_2 = spo.minimize(sse_multi, [0.001, 0.001, -36],
+                         method='nelder-mead',
+                         args=(X, df['goal_difference']))
+min_res_2
+```
+
+Here are the parameters:
+
+* slope for `defense`
+* slope for `attack`
+* intercept.
+
+```{python}
+min_res_2.x
+```
+
+We can do the same parameter estimating using `statsmodels` in our case, because we are using the standard least-squares cost function.
+
+```{python}
+fitted = smf.ols('goal_difference ~ defense + forward', data=df).fit()
+fitted.summary()
+```
+
+The found parameters are almost exactly what we found with `minimize`.
+
+```{python}
+fitted.params
+```
+
+The parameters make us think that we gain very little — or even lose — by extra spending on forwards, given a particular level of spending on defense.
+
+Another way of looking at this is to first *remove* ("regress out") the effect of spending on defense, leaving the errors (AKA *residuals*).  The residuals are what remains of goal difference after we have done the best job we can (in the least-squares sense) of removing the effect of spending on defense.
+
+```{python}
+defense_only_fit = smf.ols('goal_difference ~ defense', data=df).fit()
+defense_only_fit.params
+```
+
+Here we calculate residuals (errors) left over after using the fit from the defense-only model.
+
+```{python}
+y_hat = defense_only_fit.params['defense'] * df['defense'] + defense_only_fit.params['Intercept']
+errors = df['goal_difference'] - y_hat
+errors
+```
+
+In fact Statsmodels is kind enough to calculate these for us, by default, in the `resid` attribute of the fit.
+
+```{python}
+defense_only_fit.resid
+```
+
+We can take the residual — left over — values, and put them back into the data frame, so Statmodels can do another fit.
+
+```{python}
+df['without_defense'] = fitted.resid
+df
+```
+
+Now we look to see if the `forward` spending can predict what is left over, after taking into account the effect of defense spending on goal difference:
+
+```{python}
+smf.ols('without_defense ~ forward', data=df).fit().summary()
+```
+
+It appears that this two-stage procedure gives a similar result to the one we saw before — once we have accounted for spending on defense, spending on forwards is no longer important, in these models.
