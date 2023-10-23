@@ -978,6 +978,10 @@ with_errors_categorical(b, c, error_vector=False)
 
 ## Categorical predictors in multiple regression models
 
+We mentioned earlier that one of the benefits of using the linear regression machinery with categorical predictors is that we can easily include other predictor variables in the model.
+
+Before we show this process, let's pull out some other vectors from the dataframe, to use in the model and the plots:
+
 ```{python}
 # store the education values as a variable
 education = np.array(df['education'])
@@ -994,7 +998,12 @@ income = np.array(df['income'])
 income
 ```
 
+You'll remember how a scatterplot looks when we have two predictor variables.
+
+On the graph below, `prestige` is plotted as a function of `education` and `income`:
+
 ```{python}
+# do not worry about this code, it just generates the plot
 fig = plt.figure(figsize = (8, 8))
 ax = fig.add_subplot(projection='3d')
 ax.scatter(education, income, prestige)
@@ -1005,7 +1014,10 @@ ax.zaxis.labelpad=-3
 plt.show()
 ```
 
+When one of the predictors is a dummy-coded categorical variable, just as on the bivariate scatterplots above, the datapoints like up at two locations (`0` and `1`) on the axis for that predictor:
+
 ```{python}
+# do not worry about this code, it just generates the plot
 fig = plt.figure(figsize = (8, 8))
 ax = fig.add_subplot(projection='3d')
 ax.scatter(type_dummy, income, prestige)
@@ -1016,6 +1028,14 @@ ax.set_zlabel('Prestige')
 ax.zaxis.labelpad=-3
 plt.show()
 ```
+
+Just as our linear regression machinery accepted a single categorical predictor, we can use it straightforwardly with multiple predictors.
+
+We'll fit a linear regression model with the following specification:
+
+`prestige` = $b_1$ * `type_dummy` + $b_2$ + `income` + $c$
+
+We can use the function in the cell below, which is a version of `ss_any_line` cost function, modified to accept multiple predictors:
 
 ```{python}
 def ss_two_predictors(bs_and_c, x1_vector, x2_vector, y_vector):
@@ -1035,10 +1055,43 @@ def ss_two_predictors(bs_and_c, x1_vector, x2_vector, y_vector):
 ```
 
 ```{python}
+# test our function, with our two predictors
 ss_two_predictors([1, 1, 1], type_dummy, income, prestige)
 ```
 
+The mathematical notation for the current model (with two predictors) is shown below:
+
+$ \vec{y} = b_1 \vec{x_1} + b_2 \vec{x_2} + \text{c} + \vec{\varepsilon} $
+
+$\begin{bmatrix}{} \text{$y_{1}$} \\ \text{$y_{2}$} \\ \text{$y_{3}$} \\ \text{$y_{4}$} \\ \text{$y_{5}$} \\ \text{$y_{6}$} \\ \text{$y_{7}$} \\ \text{$y_{8}$} \\ \text{$y_{9}$} \\ \text{$y_{10}$} \\ \text{$y_{11}$} \\ \text{$y_{12}$} \\ \text{$y_{13}$} \\ \text{$y_{14}$} \\ \text{$y_{15}$} \\ \end{bmatrix} = b_1 * \begin{bmatrix}{} \text{$x_{1_1}$} \\ \text{$x_{1_2}$} \\ \text{$x_{1_3}$} \\ \text{$x_{1_4}$} \\ \text{$x_{1_5}$} \\ \text{$x_{1_6}$} \\ \text{$x_{1_7}$} \\ \text{$x_{1_8}$} \\ \text{$x_{1_9}$} \\ \text{$x_{1_{10}}$} \\ \text{$x_{1_{11}}$} \\ \text{$x_{1_{12}}$} \\ \text{$x_{1_{13}}$} \\ \text{$x_{1_{14}}$} \\ \text{$x_{1_{15}}$} \\ \end{bmatrix} + b_2 * \begin{bmatrix}{} \text{$x_{2_{1}}$} \\ \text{$x_{2_{2}}$} \\ \text{$x_{2_{3}}$} \\ \text{$x_{2_{4}}$} \\ \text{$x_{2_{5}}$} \\ \text{$x_{2_{6}}$} \\ \text{$x_{2_{7}}$} \\ \text{$x_{2_{8}}$} \\ \text{$x_{2_{9}}$} \\ \text{$x_{2_{10}}$} \\ \text{$x_{2_{11}}$} \\ \text{$x_{2_{12}}$} \\ \text{$x_{2_{13}}$} \\ \text{$x_{2_{14}}$} \\ \text{$x_{2_{15}}$} \\ \end{bmatrix} +c + \begin{bmatrix}{} \text{$\varepsilon_{1}$} \\ \text{$\varepsilon_{2}$} \\ \text{$\varepsilon_{3}$} \\ \text{$\varepsilon_{4}$} \\ \text{$\varepsilon_{5}$} \\ \text{$\varepsilon_{6}$} \\ \text{$\varepsilon_{7}$} \\ \text{$\varepsilon_{8}$} \\ \text{$\varepsilon_{9}$} \\ \text{$\varepsilon_{10}$} \\ \text{$\varepsilon_{11}$} \\ \text{$\varepsilon_{12}$} \\ \text{$\varepsilon_{13}$} \\ \text{$\varepsilon_{14}$} \\ \text{$\varepsilon_{15}$} \\ \end{bmatrix}$
+
+You'll notice that this is identical to the notation that we saw previously, when including two numeric predictors.
+
+The only difference is that one of our predictors is a dummy coded binary categorical variable.
+
+The output of the cell below shows our model in vector form (with our actual data), and let's you interact with the two slopes ($b_1$ and $b_2$) and the intercept ($c$), to see the fitting process, via the sliders:
+
+*Note:* again, it is best to interact with this notation slowly and carefully, making small changes and paying attention to what happens.
+
 ```{python}
+# interactive notation for the two predictor model
+def notation_interact_two_pred(b1,b2, c):
+    current_fitted = b1*type_dummy + b2*income + c
+    jupyprint("The full model : remember that the error vector is computed by subtracting the fitted values $\\vec{\\hat{y}}$ from the `prestige` scores $\\vec{y}$")
+    jupyprint("`prestige` = $b_1$ * `type_dummy` + $b_2$ + `income` + $c$")
+    jupyprint(f"${arraytex(np.atleast_2d(prestige.round(2)).T)} = {round(b1, 2)} * {arraytex(np.atleast_2d(type_dummy).T)} + {round(b2, 2)} * {arraytex(np.atleast_2d(income).T)} + {round(c, 2)} + {arraytex(np.atleast_2d(prestige - current_fitted).round(2).T)}$")
+    jupyprint(f"The sum of the squared error, for this slope/intercept pairing is: <b> {round(ss_any_line([b, c], type_dummy, prestige), 2)}</b>")
+    jupyprint('The fitted values $\\vec{\\hat{y}}$ for the current slopes/intercept combination:')
+    jupyprint(f"${arraytex(np.atleast_2d((current_fitted).round(2)).T)} = {round(b1, 2)} * {arraytex(np.atleast_2d(type_dummy).T)} + {round(b2, 2)} * {arraytex(np.atleast_2d(income).T)} + {round(c, 2)}$")
+
+# interactive notation
+interact(notation_interact_two_pred, b1 = (-100, 100, 0.1), b2 = (-100, 100, 0.1), c = (-100, 100, 0.1))
+```
+
+We can send our cost function to `minimize`, to find the slope/intercept combination ($b_1, b_2, c$) that gives the lowest value of the cost function (e.g. the lowest sum of the squared error):
+
+```{python}
+# minimize our cost function
 min_ss_two_predictor = minimize(ss_two_predictors,# the function we are minimizing
                                [1, 1, 1], # a list of initial guesses for the parameters
                                args=(type_dummy, income, prestige),
@@ -1047,21 +1100,34 @@ min_ss_two_predictor = minimize(ss_two_predictors,# the function we are minimizi
 min_ss_two_predictor
 ```
 
+As previously, we can pull out our parameter estimates and store them as separate variables:
+
 ```{python}
+# view all the parameter estimates
 min_ss_two_predictor.x
 ```
 
 ```{python}
+# save the first slope (for the `type_dummy`)
 type_slope = min_ss_two_predictor.x[0]
+
+type_slope 
 ```
 
 ```{python}
+# save the second slope (for the `income`)
 income_slope = min_ss_two_predictor.x[1]
+income_slope 
 ```
 
 ```{python}
+# save the intercept
 intercept_type_income = min_ss_two_predictor.x[2] 
+
+intercept_type_income 
 ```
+
+The graph below shows the regression plane for the current model (remember, with two predictors we fit a plane rather than a line). The plane is generated from the parameter estimates we just obtained:
 
 ```{python}
 # do not worry about this code, iit is just to generate the 3D plots
@@ -1133,38 +1199,56 @@ def plot_model_3D(x1_slope, x2_slope, c, show_errors = True, show = True):
 make_3d_scatter(x1 = type_dummy, x2 = income, y = prestige)
 ```
 
+You can see that this process is exactly the same as fitting a linear regression plane when we have two numeric predictors, only now the datapoints "line up" at the values of the dummy codes.
+
+The regression plane itself covers the area between the dummy codes, but we do not have any observational units with predictor scores that fall in that region (e.g. the dummy variable values are either `0` OR `1`).
+
+The output of the cell below let's you interact with the regression plane by changing the values of the following parameters:
+
+`x1_slope`: the slope of the `type_dummy` variable
+
+`x2_slope`: the slope of the `income` variable
+
+`c`: the intercept
+
 ```{python}
+# this code just generates the interactive plot
 interact(plot_model_3D, x1_slope = (-100, 100, 0.1), x2_slope = (-10, 10, 0.1), c = (-100, 100, 0.1))
 ```
 
+## Statistical adjustment
+
+As we've seen previously the advantage of multiple regression is that (by including several predictors in the model) we the model then *adjusts* the parameter estimates in light of the other variables.
+
+If we fit separate single-predictor linear regressions, then each regression simply ignores the other predictor variable.
+
+This process works exactly the same way when one predictor is categorical. The process is easiest to appreciate graphically.
+
+Let's fit a single predictor linear regression predicting `prestige` as a function of `income`. Because this is a single predictor linear regression, it *ignores* `type_dummy`:
+
 ```{python}
+# a linear regression predicting `prestige` as a function of `income`, (ignoring `type_dummy`)
 income_single_reg = sps.linregress(income, prestige)
 
 income_single_reg
 ```
 
-```{python}
-jupyprint('### `prestige ~ income` (ignoring `type`)')
-plot_model_3D(x1_slope = 0, x2_slope = income_single_reg.slope , c = income_single_reg.intercept,
-             show_errors = False)
-```
+Let's fit another, separate, single predictor linear regression predicting `prestige` as a function of `type_dummy`. Again, because this is a single predictor linear regression, it *ignores* `income`.
 
 ```{python}
+# a linear regression predicting `prestige` as a function of `type_dummy`, (ignoring `income`)
 type_single_reg = sps.linregress(type_dummy, prestige)
 
 type_single_reg
 ```
 
-```{python}
-jupyprint('### `prestige ~ type` (ignoring `income`)')
-plot_model_3D(x1_slope = type_single_reg.slope, x2_slope = 0 , c = type_single_reg.intercept,
-             show_errors = False)
-```
+The graph below shows the three regressions on separate graphs.
 
-```{python}
-jupyprint('### `prestige ~ type + income`')
-make_3d_scatter(x1 = type_dummy, x2 = income, y = prestige)
-```
+The single predictor regressions are also shown on 3D scatterplots **but the slope of the plane only takes into account information from one predictor variable**. E.g. the slope of the other predictor is set to 0 (which is the same as not including it in the model).
+
+You can see that in the third graph (from the multiple regression, with `type_dummy` AND `income` as predictors) the plane is adjusted to account for both variables:
+
+*Note*: it is best to right click on this graph, and open it as an image in a separate tab, so you can see it more clearly.
 
 ```{python}
 # do not worry about this code, it is just to generate the 3D plots
@@ -1218,15 +1302,4 @@ def single_multi_comparison_subplots(x1 = type_dummy, x2 = income, y = prestige,
     plt.legend(loc = (1,  1))
     
 single_multi_comparison_subplots()
-```
-
-```{python}
-# here to check parameters, might remove
-import statsmodels.formula.api as smf
-
-import warnings  
-warnings.filterwarnings("ignore", message="kurtosistest only valid for n>=20", category=UserWarning)
-
-for model_spec in ["prestige ~ income", "prestige ~ type_dummy", "prestige ~ type_dummy + income"]:
-    display(smf.ols(model_spec, data = df).fit().summary())
 ```
