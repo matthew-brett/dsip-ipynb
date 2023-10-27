@@ -37,7 +37,7 @@ examples of some variables:
 * a person's religion 
 * a person's life satisfaction 
 
-The *lab book principle* states: to work out what type of variable something is, think about how you would record each observation in a lab book, if you were collecting the raw data yourself. (This is quite an archaic example, as today we probably wouldn't collect data this way, but it's useful for thinking abotu what type of variable something is!).
+The *lab book principle* states: to work out what type of variable something is, think about how you would record each observation in a lab book, if you were collecting the raw data yourself. (This is quite an archaic example, as today we probably wouldn't collect data this way, but it's useful for thinking about what type of variable something is!).
 
 If you would write a number when recording the raw data for the variable, then it is a numerical variable. If you would write a qualitative category label when recording the raw data for the variable, then the variable is a categorical variable.
 
