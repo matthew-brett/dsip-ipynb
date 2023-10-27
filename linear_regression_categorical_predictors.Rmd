@@ -880,7 +880,7 @@ jupyprint('Showing the **bc** group only (`type_dummy == 1`):')
 jupyprint(f"${arraytex(np.atleast_2d((b * type_dummy[type_dummy == 1] + c).round(2)).T)} = {b.round(2)} * {arraytex(np.atleast_2d(type_dummy[type_dummy == 1]).T)} + {c.round(2)}$")
 ```
 
-The slope describs the *difference* between the group means, so when it is "switched on" by the dummy variable, it modifies the fitted values (it this case it is subtracted from the intercept, the intercept being the mean of the `prof` group).
+The slope describes the *difference* between the group means, so when it is "switched on" by the dummy variable, it modifies the fitted values (it this case it is subtracted from the intercept, the intercept being the mean of the `prof` group).
 
 For more clarity, let's look at the fitted values calculation, at the level of an individual observational unit in each group. 
 
@@ -973,7 +973,7 @@ c + b
 bc_mean
 ```
 
-Once, more, take this oppurtunity to make sure that these interpretations of the parameter estimates make sense you from a graphical perspective; the graph of the best-fitting line is shown below for convenience:
+Once, more, take this opportunity to make sure that these interpretations of the parameter estimates make sense you from a graphical perspective; the graph of the best-fitting line is shown below for convenience:
 
 ```{python}
 # show the best-fitting line again (for convenience)
