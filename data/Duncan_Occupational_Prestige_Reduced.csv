@@ -1,0 +1,16 @@
+name,type,income,education,prestige
+lawyer,prof,76,98,89
+banker,prof,78,82,92
+machine.operator,bc,21,20,24
+soda.clerk,bc,12,30,6
+bartender,bc,16,28,7
+waiter,bc,8,32,10
+policeman,bc,34,47,41
+teacher,prof,48,91,73
+professor,prof,64,93,93
+shoe.shiner,bc,9,17,3
+machinist,bc,36,32,57
+minister,prof,21,84,87
+pilot,prof,72,76,83
+electrician,bc,47,39,53
+store.manager,prof,42,44,45
