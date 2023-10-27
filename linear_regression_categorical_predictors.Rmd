@@ -26,7 +26,11 @@ Remember that a variable is anything we can measure that varies between observat
 - Is climate change caused by human activity?
 - Do longer prison sentences reduce offending behaviour?
 
-Variables come in different types. That can sound a bit abstract, but to work out what type of variable something is it's easiest to think about in terms of we will call the lab book principle (this idea is heavily influenced by an example from [here](http://biostathandbook.com)). Let's think through a few examples of some variables:
+Variables come in different types. That can sound a bit abstract, but to work
+out what type of variable you have, it's easiest to think about using what we
+will call the *lab book principle* (this idea is heavily influenced by an
+example from [here](http://biostathandbook.com)). Let's think through a few
+examples of some variables:
 
 * number of children in a household
 * a person's age 
