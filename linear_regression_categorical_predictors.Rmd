@@ -891,7 +891,7 @@ jupyprint('Showing the **`prof`** group only (`type_dummy == 0`):')
 jupyprint(f"${arraytex(np.atleast_2d((b * type_dummy[type_dummy == 0] + c).round(2)).T)} = {b.round(2)} * {arraytex(np.atleast_2d(type_dummy[type_dummy == 0]).T)} + {c.round(2)}$")
 ```
 
-You can see that when the dummy predcitor variable equals `0` (the `prof` group), the slope (the value 55.16 in the equation above) get's "switched off" - meaning that the fitted values just equal the intercept (the value 80.29 in the equation above).
+You can see that when the dummy predcitor variable equals `0` (the `prof` group), the slope (the value 55.16 in the equation above) gets "switched off" - meaning that the fitted values just equal the intercept (the value 80.29 in the equation above).
 
 Conversely, for the `bc` group, where the dummy variable equals `1`:
 
@@ -922,12 +922,14 @@ Let's summarize:
 
 - for an observational unit in the group dummy coded as 0 (in our case in the `bc` group), the slope gets "switched off", so the fitted value just equals the intercept. (The slope is "switched off" because the slope gets multiplied by the dummy code: `0`!).
 
-- for the group which is dummy coded as 1 (in our case in the `prof` group), the slope get's "switched on" e.g. the slope gets multiplied by the dummy code `1`.
-
-- the slope describes the *difference* between the mean of the group dummy coded as `0`, and the mean of the group dummy coded as `1`
-
-- ... so "switching on" the slope returns the mean of the group dummy coded as 1 (e.g. this is the intercept plus or minus ($\pm$) the *difference* between the group means.
-
+- for the group which is dummy coded as 1 (in our case in the `prof` group),
+  the slope gets "switched on" e.g. the slope gets multiplied by the dummy code
+  `1`.
+- the slope describes the *difference* between the mean of the group dummy
+  coded as `0`, and the mean of the group dummy coded as `1`.
+- ... so "switching on" the slope returns the mean of the group dummy coded as
+  1 (e.g. this is the intercept plus or minus ($\pm$) the *difference* between
+  the group means.
 
 Let's calculate these fitted values ourselves in python, so we can verify these relationships, first at the vector/array level:
 
