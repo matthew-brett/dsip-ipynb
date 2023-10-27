@@ -1360,6 +1360,8 @@ single_multi_comparison_subplots()
 
 Now, let's we imagine the graphs as physical objects, where you could stand on one axis and look at the graph in a physical space. The image below shows some humanlike figures added to the graph, with a blue line indicating which direction they are looking in:
 
+*Note*: again, you may want to open this image in a separate tab, for better viewing.
+
 ![](images/stat_adjust.png)
 
 
@@ -1400,7 +1402,7 @@ Remember the meaning of the slope in multiple regression is:
 
 Our third model (on the rightmost graph) let's us make statements like:
 
-- for two observational units (occupations) which had equal `income` but one was classified as "professional" (`prof`) and the other as "white collar" (`wc`), then based on the relationships in our dataset we would predict they would differ in `prestige` by 29.98 percentage points (in favour of `prof` jobs)".
+- for two observational units (occupations) which had equal `income` but one was classified as "professional" (`prof`) and the other as "blue collar" (`bc`), then based on the relationships in our dataset we would predict they would differ in `prestige` by 29.98 percentage points (in favour of `prof` jobs)".
 
 This implies that the social classification/perception of jobs as being either professional or white collar leads to differences in the perceived prestigiousness of the job, independently of differences in income.
 
