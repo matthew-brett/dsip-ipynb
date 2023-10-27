@@ -100,7 +100,7 @@ See [the dataset
 page](https://github.com/odsti/datasets/tree/main/duncan_occupations) for more
 detail.
 
-For this page, to keep things simple and digestible, we will use a reduced version of the dataset. The reduced dataset contains 15 observational units: 
+For this page, to keep things simple and digestible, we will use a reduced version of the dataset, by . The reduced dataset contains 15 observational units, selected at random from the larger dataset of 45 rows (units):
 
 ```{python}
 # read in the data
