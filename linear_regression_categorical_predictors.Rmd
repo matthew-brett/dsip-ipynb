@@ -823,7 +823,7 @@ The process we have used for finding the parameter estimates $b$ and $c$ of the 
 - We compute fitted values for this specific slope/intercept pairing
 - We subtract the fitted values from the actual outcome variable scores.
     - Because the fitted values depend on the slope/intercept pairing, the specific pairing gives a specific error vector
-- We compute the sum of the sqaured error, from the error vector
+- We compute the sum of the squared error, from the error vector
 - We (well, `minimize`) finds the slope/intercept pairing which gives the lowest sum of the squared error 
 
 **The only difference in this process when we use a binary categorical predictor (like `type_dummy`) is that we now only get two *unique* fitted values (one for each dummy code). For the best-fitting line, these unique fitted values will always be equal to the mean of each group.**
