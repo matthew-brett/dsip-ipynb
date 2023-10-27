@@ -45,13 +45,24 @@ So when recording the number of children a person has we would write a whole num
 
 For each person's age we would probably write also write a number. Though if we wanted to write their exact age (55.586759 years etc.) we could measure that to an arbitrary level of precision. This is unlike the number of children, which has to be a whole number.
 
-For the religion of each person we would write down a *qualitative category label* ('Buddhist', 'Sikh', 'Christian', 'Muslim', 'Jewish', 'Atheist' etc.). (*Note:* we could put these labels in any order, they don't have a natural ordering).
+For the religion of each person we would write down a *qualitative category
+label* ('Buddhist', 'Sikh', 'Christian', 'Muslim', 'Jewish', 'Atheist' etc.).
+Let's say we were asking our respondent to select a religion from a list; in
+this case there is no one compelling *order* for that list — it could be
+alphabetical, or random or by frequency in the population of your respondents.
 
-For the life satisfaction of each person, we could ask them to rate their life satisfaction on a numerical scale (between 1 and 7 for instance) or we could ask them to select from a set of *ordered labels* (e.g.: 'very unsatisfied', 'unsatisfied', 'neither satisfied or unsatisfied', 'satisfied', 'very satisfied'). (*Note:* these labels do have a natural ordering. We may use a number to *represent* one of the labels, but the number is not a true numerical quantity, like a variable such as 'number of children' would be e.g. the number merely represents one of the labels).
+For the life satisfaction of each person, we could ask them to rate their life
+satisfaction on a numerical scale (between 1 and 7 for instance) or we could
+ask them to select from a set of *ordered labels* (e.g.: 'very unsatisfied',
+'unsatisfied', 'neither satisfied or unsatisfied', 'satisfied', 'very
+satisfied'). If we present a list of these labels to the respondent, they have
+a natural ordering. We may use a number to *represent* one of the labels, but
+the number is not a true numerical quantity, like a variable such as 'number of
+children' would be e.g. the number merely represents one of the labels.
 
-The type of variable we are dealing with influences the analysis methods we can use, and different types of variable also lend themselves to being represented in different ways in any programming language we might use. 
+The type of variable we are dealing with influences the analysis methods we can use, and different types of variable also lend themselves to being represented in different ways in any programming language we might use.
 
-On this page we will be looking at how to include categorical predictors in regression models. This means predictor variables where - if you were recording the raw data in a lab book - you would write a qualitative category label..
+On this page we will be looking at ways to include categorical predictors in regression models. This means predictor variables where - if you were recording the raw data in a lab book - you would write a qualitative category label..
 
 Categorical variables appear in many datasets, and knowing how to include them as predictor variables increases our modelling flexibility - e.g. the number of questions we can ask and ideas we can test!
 
