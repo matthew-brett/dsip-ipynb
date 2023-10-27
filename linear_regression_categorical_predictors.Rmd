@@ -141,7 +141,7 @@ This contrasts with univariate distribution of a numerical variable (like `incom
 df['income'].plot(kind = 'hist', bins = 4, xlabel = 'Income');
 ```
 
-These univariate distributions are conveying the same information - they tell us the number of observational units at each value the variable can take - they just look so different because the variables they are repsenting are of different types (e.g. `income` is a numeric variable; `type` is a binary categorical variable). **This is an important point to remember for the rest of the page...**
+These univariate distributions are conveying the same information - they tell us the number of observational units at each value the variable can take - they just look so different because the variables they are repsenting are of different types (binary categorical vs numeric).**This is an important point to remember for the rest of the page...**
 
 When we want to see how two variables are related, as on the other pages, we plot one variable *as a function of another* e.g. by putting one on the x-axis and the other on the y-axis - this is called a *bivariate plot*, because we are looking at the relationship between two variables.
 
