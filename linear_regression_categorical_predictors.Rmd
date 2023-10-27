@@ -28,14 +28,16 @@ Remember that a variable is anything we can measure that varies between observat
 
 Variables come in different types. That can sound a bit abstract, but to work out what type of variable something is it's easiest to think about in terms of we will call the lab book principle (this idea is heavily influenced by an example from [here](http://biostathandbook.com)). Let's think through a few examples of some variables:
 
-* Number of children in a household
-* Age of each person living on a street
-* Religion of each person living on a street
-* Life satisfaction of each person living on a street
+* number of children in a household
+* a person's age 
+* a person's religion 
+* a person's life satisfaction 
 
-The *lab book principle* states: to work out what type of variable something is, think about how you would record each observation in a lab book, if you were collecting the raw data yourself. If you would write a number when recording the raw data for the variable, then it is a numerical variable. If you would write a qualitative category label when recording the raw data for the variable, then the variable is a categorical variable.
+The *lab book principle* states: to work out what type of variable something is, think about how you would record each observation in a lab book, if you were collecting the raw data yourself. (This is quite an archaic example, as today we probably wouldn't collect data this way, but it's useful for thinking abotu what type of variable something is!).
 
-So when recording the number of children each person on the street has we would write a number (0, 1, 2, 3 and so on) in the lab book.
+If you would write a number when recording the raw data for the variable, then it is a numerical variable. If you would write a qualitative category label when recording the raw data for the variable, then the variable is a categorical variable.
+
+So when recording the number of children a person has we would write a whole number (0, 1, 2, 3 and so on) in the lab book.
 
 For each person's age we would probably write also write a number. Though if we wanted to write their exact age (55.586759 years etc.) we could measure that to an arbitrary level of precision. This is unlike the number of children, which has to be a whole number.
 
