@@ -341,7 +341,7 @@ We can easily carry out the dummy-coding in python, using the `.replace()` metho
 ```{python}
 # store the prestige values as a variable 
 type_dummy = df['type'].replace(['prof', 'bc'], [0, 1]).values
-# ?
+
 # show the values
 type_dummy
 ```
