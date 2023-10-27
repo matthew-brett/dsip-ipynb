@@ -360,8 +360,8 @@ Now, we can plot `prestige` as a function of our `type_dummy`:
 # plot the mean of each group
 def simple_scatter_with_dummy():
     plt.scatter(type_dummy, prestige)
-    plt.xticks([0, 1], labels = ["0 \n(prof)", "1 \n(blue collar)"])
-    plt.xlabel('Type Dummy')
+    plt.xticks([0, 1])
+    plt.xlabel('Type Dummy\n{0 = prof, 1 = bc}')
     plt.ylabel('Prestige')
     
 simple_scatter_with_dummy()
@@ -824,7 +824,7 @@ The process we have used for finding the parameter estimates $b$ and $c$ of the 
 - We subtract the fitted values from the actual outcome variable scores.
     - Because the fitted values depend on the slope/intercept pairing, the specific pairing gives a specific error vector
 - We compute the sum of the squared error, from the error vector
-- We (well, `minimize`) finds the slope/intercept pairing which gives the lowest sum of the squared error 
+- We (well, `minimize`) finds the slope/intercept pairing which gives the lowest sum of the squared error, after repeated iterations of the process outlined in the first steps
 
 **The only difference in this process when we use a binary categorical predictor (like `type_dummy`) is that we now only get two *unique* fitted values (one for each dummy code). For the best-fitting line, these unique fitted values will always be equal to the mean of each group.**
 
@@ -880,7 +880,7 @@ jupyprint('Showing the **bc** group only (`type_dummy == 1`):')
 jupyprint(f"${arraytex(np.atleast_2d((b * type_dummy[type_dummy == 1] + c).round(2)).T)} = {b.round(2)} * {arraytex(np.atleast_2d(type_dummy[type_dummy == 1]).T)} + {c.round(2)}$")
 ```
 
-The slope describes the *difference* between the group means, so when it is "switched on" by the dummy variable, it modifies the fitted values (it this case it is subtracted from the intercept, the intercept being the mean of the `prof` group).
+The slope, then, describes the *difference* between the group means, so when it is "switched on" by the dummy variable, it modifies the fitted values (it this case it is subtracted from the intercept, the intercept being the mean of the `prof` group).
 
 For more clarity, let's look at the fitted values calculation, at the level of an individual observational unit in each group. 
 
@@ -1237,6 +1237,43 @@ income_single_reg = sps.linregress(income, prestige)
 income_single_reg
 ```
 
+```{python}
+# do not worry about this code it just generates the plot
+def make_scatter(x, y, b, c, with_errors = True, show = False,
+                 xlabel = 'Income',
+                 title = 'Prestige ~ Income \n(ignoring `type`)',
+                 x_0_1 = False,
+                 rev_min_max = False,
+                 show_fitted = True):
+    plt.scatter(x, y, label='Actual values ($y$)')
+    # plot the predicted values
+    fitted = b * x + c
+    if show_fitted == True:
+        plt.plot(x, fitted, 'ro', label='Fitted values from linear regression ($\hat{y}$)')
+    if rev_min_max == False:
+        plt.plot([x.min(), x.max()], [fitted.min(), fitted.max()], linestyle = '--', color = 'red')
+    if rev_min_max == True:
+        plt.plot([x.min(), x.max()], [fitted.max(), fitted.min()], linestyle = '--', color = 'red')
+    if with_errors == True:
+        # plot the distance between predicted and actual, for all points.
+        n = len(x)
+        for i in range(n):
+            plt.plot([x[i], x[i]], [fitted[i], y[i]], 'k:')
+        # the following code line is just to trick Matplotlib into making a new
+        # a single legend entry for the dotted lines.
+        plt.plot([], [], 'k:', label='Errors ($ \\varepsilon $)')
+    plt.xlabel(xlabel)
+    plt.ylabel('Prestige')
+    plt.title(title)
+    if x_0_1 == True:
+        plt.xticks([0, 1])
+    # show the legend
+    plt.legend();
+    if show == True:
+        plt.show()
+make_scatter(income, prestige, income_single_reg.slope, income_single_reg.intercept)
+```
+
 Let's fit another, separate, single predictor linear regression predicting `prestige` as a function of `type_dummy`. Again, because this is a single predictor linear regression, it *ignores* `income`.
 
 ```{python}
@@ -1246,13 +1283,24 @@ type_single_reg = sps.linregress(type_dummy, prestige)
 type_single_reg
 ```
 
+```{python}
+# generate the plot
+make_scatter(type_dummy, prestige,
+             type_single_reg.slope,
+             type_single_reg.intercept,
+             title = 'Prestige ~ Type \n(ignoring `income`)',
+             xlabel = 'Type\n{0 = prof, 1 = bc}',
+             x_0_1 = True,
+             rev_min_max=True)
+```
+
 The graph below shows the three regressions on separate graphs.
 
 The single predictor regressions are also shown on 3D scatterplots **but the slope of the plane only takes into account information from one predictor variable**. E.g. the slope of the other predictor is set to 0 (which is the same as not including it in the model).
 
 You can see that in the third graph (from the multiple regression, with `type_dummy` AND `income` as predictors) the plane is adjusted to account for both variables:
 
-*Note*: it is best to right click on this graph, and open it as an image in a separate tab, so you can see it more clearly.
+*Note*: it is **best to right click on this graph, and open it as an image in a separate tab**, so you can see it more clearly.
 
 ```{python}
 # do not worry about this code, it is just to generate the 3D plots
@@ -1307,3 +1355,51 @@ def single_multi_comparison_subplots(x1 = type_dummy, x2 = income, y = prestige,
     
 single_multi_comparison_subplots()
 ```
+
+Now, let's we imagine the graphs as physical objects, where you could stand on one axis and look at the graph. The image below shows some humanlike figures added to the graph, with a blue line indicating which direction they are looking:
+
+![](images/stat_adjust.png)
+
+
+Here is what the person on the leftmost graph (dressed in blue) would see:
+
+```{python}
+# generate the plot
+make_scatter(income, prestige, income_single_reg.slope, income_single_reg.intercept, show_fitted=False)
+```
+
+Here is what the person on the rightmost graph (shown all in black) would see:
+
+```{python}
+# generate the plot
+make_scatter(type_dummy, prestige,
+             type_single_reg.slope,
+             type_single_reg.intercept,
+             title = 'Prestige ~ Type \n(ignoring `income`)',
+             xlabel = 'Type\n{0 = prof, 1 = bc}',
+             x_0_1 = True,
+             rev_min_max=True,
+             show_fitted=False)
+```
+
+The three graphs are shown again below, for convenience. If you look at the rightmost graph, you'll see that the red regression plane, with respect to each axis, has been **adjusted** when we fit the plane taking into account both variables, relative to the other two graphs, where for each we ignore the other predictor variable when fitting the plane.
+
+![](images/stat_adjust.png)
+
+If we compare the `type` slope on the middle and rightmost graph, you can see that it is smaller on the right most graph (the slope is called $b_1$ on both graphs).
+
+Remember that for binary categorical predictors, the slope represents the **predicted difference between the mean outcome score of observational units in each category**. 
+
+On the rightmost graph/regression model, because `income` has also been included in the fitting process, this has **adjusted** the predicted difference between the mean outcome score of observational units in each category. It has been adjusted in light of the `income` predictor.
+
+Remember the meaning of the slope in multiple regression is: 
+
+> ""The slope of a predictor variable (e.g. $b_1$) is the expected change in the outcome variable if we compared two observational units which differed only by 1 point on that predictor variable, *holding the other predictor constant*"."
+
+Our third model (on the rightmost graph) let's us make statements like:
+
+- for two observational units (occupations) which had equal `income` but one was classified as "professional" (`prof`) and the other as "white collar" (`wc`), then based on the relationships in our dataset we would predict they would differ in `prestige` by 29.98 percentage points (in favour of `prof` jobs)".
+
+This implies that the social classification/perception of jobs as being either professional or white collar leads to differences in the perceived prestigiousness of the job, independently of differences in income.
+
+That's a pretty interesting effect! And it shows the both the use of multiple regression, and the utility of including categorical predictors in regression models.
