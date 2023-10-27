@@ -153,7 +153,7 @@ Let's pull out our variables into numpy arrays, to save us from having to index 
 
 ```{python}
 # type has a special meaning in python, so we will call our `type` array `job_type`
-type 
+type
 ```
 
 ```{python}
@@ -257,7 +257,7 @@ Any slope we use on the `job_type` vector is going to perform an operation we do
 
 ## Can/should we use linear regression here?
 
-Astute readings might have noticed that  we *could* use a [permutation test](https://lisds.github.io/textbook/permutation/population_permutation.html) here. This would allow us to statistically test for a difference between the mean `prestige` of `bc` jobs and `prof` jobs. (We can also refer to these as the `bc` group and the `prof` group, as they are categories which categorize the occupations into separate groups).
+Astute readers might have noticed that  we *could* use a [permutation test](https://lisds.github.io/textbook/permutation/population_permutation.html) here. This would allow us to statistically test for a difference between the mean `prestige` of `bc` jobs and `prof` jobs. (We can also refer to these as the `bc` group and the `prof` group, as they are categories which categorize the occupations into separate groups).
 
 In data science, there are often many different approaches we can take to the same question. So, let's press ahead trying to use our linear regression framework here for now ... the advantage of this is that (as we will later see) we get the benefits of *multiple* linear regression if we use the regression framework. E.g. we can very easily include other predictor variables in our model.
 
