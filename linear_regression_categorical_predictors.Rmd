@@ -1222,11 +1222,11 @@ interact(plot_model_3D, x1_slope = (-100, 100, 0.1), x2_slope = (-10, 10, 0.1), 
 
 ## Statistical adjustment
 
-As we've seen previously the advantage of multiple regression is that (by including several predictors in the model) we the model then *adjusts* the parameter estimates in light of the other variables.
+As we've seen previously the advantage of multiple regression is that (by including several predictors in the model) the model then *adjusts* the parameter estimates in light of the other variables.
 
 If we fit separate single-predictor linear regressions, then each regression simply ignores the other predictor variable.
 
-This process works exactly the same way when one predictor is categorical. The process is easiest to appreciate graphically.
+This process works exactly the same way when one predictor is categorical, and the process of "statistical adjustment" is easiest to appreciate graphically.
 
 Let's fit a single predictor linear regression predicting `prestige` as a function of `income`. Because this is a single predictor linear regression, it *ignores* `type_dummy`:
 
@@ -1236,6 +1236,8 @@ income_single_reg = sps.linregress(income, prestige)
 
 income_single_reg
 ```
+
+The graph below shows the regression line, and the data:
 
 ```{python}
 # do not worry about this code it just generates the plot
@@ -1274,7 +1276,7 @@ def make_scatter(x, y, b, c, with_errors = True, show = False,
 make_scatter(income, prestige, income_single_reg.slope, income_single_reg.intercept)
 ```
 
-Let's fit another, separate, single predictor linear regression predicting `prestige` as a function of `type_dummy`. Again, because this is a single predictor linear regression, it *ignores* `income`.
+Let's fit another, separate, single predictor linear regression, predicting `prestige` as a function of `type_dummy`. Again, because this is a single predictor linear regression, it *ignores* `income`.
 
 ```{python}
 # a linear regression predicting `prestige` as a function of `type_dummy`, (ignoring `income`)
@@ -1356,7 +1358,7 @@ def single_multi_comparison_subplots(x1 = type_dummy, x2 = income, y = prestige,
 single_multi_comparison_subplots()
 ```
 
-Now, let's we imagine the graphs as physical objects, where you could stand on one axis and look at the graph. The image below shows some humanlike figures added to the graph, with a blue line indicating which direction they are looking:
+Now, let's we imagine the graphs as physical objects, where you could stand on one axis and look at the graph in a physical space. The image below shows some humanlike figures added to the graph, with a blue line indicating which direction they are looking in:
 
 ![](images/stat_adjust.png)
 
@@ -1368,7 +1370,7 @@ Here is what the person on the leftmost graph (dressed in blue) would see:
 make_scatter(income, prestige, income_single_reg.slope, income_single_reg.intercept, show_fitted=False)
 ```
 
-Here is what the person on the rightmost graph (shown all in black) would see:
+Here is what the person on the middle graph (shown all in black) would see:
 
 ```{python}
 # generate the plot
@@ -1382,11 +1384,11 @@ make_scatter(type_dummy, prestige,
              show_fitted=False)
 ```
 
-The three graphs are shown again below, for convenience. If you look at the rightmost graph, you'll see that the red regression plane, with respect to each axis, has been **adjusted** when we fit the plane taking into account both variables, relative to the other two graphs, where for each we ignore the other predictor variable when fitting the plane.
+The three graphs are shown again below, for convenience. If you look at the rightmost graph, you'll see that the red regression plane, with respect to each axis, has been **adjusted** when we fit the plane taking into account both variables - (this adjustment is relative to the other two graphs, where we ignore the other predictor variable when fitting the plane).
 
 ![](images/stat_adjust.png)
 
-If we compare the `type` slope on the middle and rightmost graph, you can see that it is smaller on the right most graph (the slope is called $b_1$ on both graphs).
+If we compare the `type` slope on the middle and rightmost graph, you can see that it is smaller on the right most graph (the slope is called $b_1$ on both graphs, it equals -55.16 on the middle graph and -29.98 on the rightmost graph).
 
 Remember that for binary categorical predictors, the slope represents the **predicted difference between the mean outcome score of observational units in each category**. 
 
