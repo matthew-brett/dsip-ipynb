@@ -725,7 +725,7 @@ plt.scatter([0, 1], [prof_mean, bc_mean],
 plt.legend();
 ```
 
-Hopefully you can see that this is indeed indentical to graph we get when we use the fitted values from the best fitting line:
+Hopefully you can see that this is indeed identical to graph we get when we use the fitted values from the best fitting line:
 
 ```{python}
 # show the best-fitting line
