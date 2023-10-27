@@ -621,7 +621,7 @@ df[['type_dummy', 'education']]
 
 There's typically a lot more variability in numeric variables than in dummy coded predictor variables, as we can see from the dataframe.
 
-We get one fitted value for each observational unit. Because each observational unit either scores `0` or `1` on the `type_dummy` variable, the x-axis location of each fitted value can only be `0` or `1`.
+After we've obtained the best-fitting slope and intercept, we get one fitted value for each observational unit, at each **unique** value of the predictor vector. Because each observational unit either scores `0` or `1` on the `type_dummy` variable, the x-axis location of each fitted value can only be `0` or `1`.
 
 Therefore all our fitted values take one of two values (more on this soon).
 
@@ -692,7 +692,7 @@ As you know, on each graph our predictor variable (`type_dummy` or `education`) 
 
 You'll see that for both graphs, the intercept describes y-axis value of the regression line, where the predictor variable == 0. In the case of our categorical predictor, a score of 0 indicates *category membership* - it indicates that an observational unit is in the `prof` category (e.g. whichever category we coded as 0). So the intercept tells us the predicted `prestige` score of an observational unit in the `prof` group.
 
-The slope, on both graphs, describes the change in the y-axis value of the regression line for a 1-unit change in the predictor variable. (E.g. if you move 1 unit along the x-axis, and compare the value of the regression line at each point). 1 unit, in the case of a categorical predictor, represents the predicted difference in the outcome variable between observational units in different categories (`prof` or `bc`)/
+The slope, on both graphs, describes the change in the y-axis value of the regression line for a 1-unit change in the predictor variable. (E.g. if you move 1 unit along the x-axis, and compare the value of the regression line at each point). 1 unit, in the case of a categorical predictor, represents the predicted difference in the outcome variable between observational units in different categories (`prof` or `bc`).
 
 **For a categorical predictor, moving from 0 to 1 on the predictor variable axis now represent a comparison between the fitted values of the group categories.**
 
