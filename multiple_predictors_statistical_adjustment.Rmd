@@ -596,6 +596,16 @@ single_multi_comparison_subplots(x1=forward,
                                           epl_goaldiff_forward_defense_intercept])
 ```
 
+```{python}
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+
+scatter_3d = px.scatter_3d(epl, x='forward', y='defense', z='goal_difference')
+
+scatter_3d.show()
+```
+
 ## Statistical adjustment, with the Duncan data, continuous and categorical predictors
 
 
