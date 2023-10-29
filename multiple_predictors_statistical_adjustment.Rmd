@@ -280,7 +280,11 @@ def plotly_3D_with_plane(dataset, x1_string, x2_string, y_string, hover_string_l
                                           line={'color': 'black', 'dash':'dash'}))
     # add a title to the plot
     scatter_3d.update_layout(title=model_title_string)
-
+    
+    # adjust view angle (to same default as matplotlib)
+    scatter_3d.update_layout(scene={'camera': {'up': {'x': 0, 'y': 0, 'z': 1},
+                                    'center': {'x': 0, 'y': 0, 'z': 0},
+                                    'eye': {'x': 1.25, 'y': -1.25, 'z': 0.6}}})
     # show the plot
     scatter_3d.show()
 
@@ -910,6 +914,8 @@ single_multi_comparison_subplots()
 
 The cell below let's you use a drop down menu to select which model is fit to the data, you can then "move around" the plot, to get a better understainding of the concepts just outlined above.
 
+The regression plane is also shown, along with the errors (as black dashed lines) for whatever model you have selected.
+
 **Pause for thought:** we recommend spending some time with this interactive plot. Changing the model and exploring each graph. Refer to the "static" plots shown above, which depict the same models. 
 
 We also recommend adjusting the plot so it is as if you are "standing" on one of the axes, as was shown the figures above. If you select one of the single predictor models, then "stand" on the axis for the predictor in the model (e.g. if you select the `prestige ~ income` model, then "stand" on the `income` axis), what you will see is equivalent to the bivariate scatterplot for that model...:
@@ -1092,11 +1098,47 @@ single_multi_comparison_subplots(x1=forward,
 ```
 
 ```{python}
-# generate the plot
-plotly_3D_with_plane(epl, 'forward', 'defense', 'goal_difference', ['team'],
-                     epl_goaldiff_forward_defense_slope_forw,
-                    epl_goaldiff_forward_defense_slope_def,
-                    epl_goaldiff_forward_defense_intercept)
+# generate the interactive plot
+def epl_plotly(model = ["`goal_difference ~ foward` \n(ignoring `defense`)",
+                           "`goal_difference ~ defense` \n(ignoring `forward`)",
+                            "`goal_difference ~ forward + defense`"]):
+    
+    ignore_defense = "`goal_difference ~ foward` \n(ignoring `defense`)"
+    ignore_forward = "`goal_difference ~ defense` \n(ignoring `forward`)"
+    adjust = "`goal_difference ~ forward + defense`"
+    if model == ignore_defense:
+        plotly_3D_with_plane(dataset=epl,
+                         x1_string='forward',
+                         x2_string='defense',
+                         y_string='goal_difference',
+                        hover_string_list=['team'],
+                        x1_slope=epl_goaldiff_forward_slope,
+                        x2_slope=0,
+                        intercept=epl_goaldiff_forward_intercept,
+                        model_title_string=ignore_defense)
+    
+    elif model == ignore_forward:
+        plotly_3D_with_plane(dataset=epl,
+                         x1_string='forward',
+                         x2_string='defense',
+                         y_string='goal_difference',
+                        hover_string_list=['team'],
+                        x1_slope=0,
+                        x2_slope=epl_goaldiff_defense_slope,
+                        intercept=epl_goaldiff_defense_intercept,
+                        model_title_string=ignore_forward)
+        
+    elif model == adjust:
+        plotly_3D_with_plane(dataset=epl,
+                         x1_string='forward',
+                         x2_string='defense',
+                         y_string='goal_difference',
+                        hover_string_list=['team'],
+                        x1_slope=epl_goaldiff_forward_defense_slope_forw,
+                        x2_slope=epl_goaldiff_forward_defense_slope_def,
+                        intercept=epl_goaldiff_forward_defense_intercept,
+                        model_title_string=adjust)
+interact(epl_plotly)
 ```
 
 ## Statistical adjustment, with the Duncan data, continuous and categorical predictors
