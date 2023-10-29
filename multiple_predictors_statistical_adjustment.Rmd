@@ -978,8 +978,38 @@ In the present case, we can clearly see the regression plane for the two-predict
 
 Statistical adjustment in this case has affect the *magnitude* but not the direction (the +/- sign) of the slope of each predictor. 
 
-However, statistical adjustment *can* also affect the direction of the slope, as we will now see.
+However, statistical adjustment *can* also affect the direction of the slope, as we will see in the final section of this page.
+
+First though, let's explore statistical adjustment in a multi-predictor linear regression model, where one of the predictors is a *categorical* variable.
 <!-- #endregion -->
+
+## Statistical adjustment, with the Duncan data, continuous and categorical predictors
+
+
+
+```{python}
+duncan_bc_prof = duncan[(duncan['type'] == 'bc') | (duncan['type'] == 'prof')].copy()
+
+duncan_bc_prof
+```
+
+```{python}
+# store the prestige values as a variable 
+type_dummy = df['type'].replace(['prof', 'bc'], [0, 1]).values
+
+# show the values
+type_dummy
+```
+
+```{python}
+duncan[duncan['type'] == 'bc']
+```
+
+```{python}
+wc_dummy = duncan['type_wc'].values
+
+prof_dummy = duncan['type_prof'].values
+```
 
 ## Statistical adjustment, with the EPL data, continuous predictors
 
@@ -1139,38 +1169,4 @@ def epl_plotly(model = ["`goal_difference ~ foward` \n(ignoring `defense`)",
                         intercept=epl_goaldiff_forward_defense_intercept,
                         model_title_string=adjust)
 interact(epl_plotly)
-```
-
-## Statistical adjustment, with the Duncan data, continuous and categorical predictors
-
-
-
-```{python}
-type_orig = duncan['type']
-
-duncan = pd.get_dummies(duncan, columns = ['type'], drop_first = True)
-
-duncan.head()
-```
-
-```{python}
-duncan['type'] = type_orig
-
-duncan.head(30)
-```
-
-```{python}
-duncan[duncan['type'] == 'bc']
-```
-
-```{python}
-wc_dummy = duncan['type_wc'].values
-
-prof_dummy = duncan['type_prof'].values
-```
-
-## Statistical adjustment, with the Duncan data, only categorical predictors
-
-```{python}
-
 ```

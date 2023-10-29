@@ -6,7 +6,7 @@ jupyter:
       extension: .Rmd
       format_name: rmarkdown
       format_version: '1.2'
-      jupytext_version: 1.14.5
+      jupytext_version: 1.14.6
   kernelspec:
     display_name: Python 3 (ipykernel)
     language: python
@@ -339,7 +339,7 @@ jupyprint(f"`type` = "+"$ \\vec{x} =$"+f" $ {arraytex(np.atleast_2d(job_type).T)
 We can easily carry out the dummy-coding in python, using the `.replace()` method on our dataframe column:
 
 ```{python}
-# store the prestige values as a variable 
+# store the type_dummy values as a variable 
 type_dummy = df['type'].replace(['prof', 'bc'], [0, 1]).values
 
 # show the values
