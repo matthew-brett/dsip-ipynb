@@ -284,7 +284,7 @@ def plotly_3D_with_plane(dataset, x1_string, x2_string, y_string, hover_string_l
     # adjust view angle (to same default as matplotlib)
     scatter_3d.update_layout(scene={'camera': {'up': {'x': 0, 'y': 0, 'z': 1},
                                     'center': {'x': 0, 'y': 0, 'z': 0},
-                                    'eye': {'x': 1.25, 'y': -1.25, 'z': 0.6}}})
+                                    'eye': {'x': 1.6, 'y': -1.6, 'z': 0.6}}})
     # show the plot
     scatter_3d.show()
 
