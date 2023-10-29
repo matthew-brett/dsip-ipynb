@@ -1192,6 +1192,49 @@ def single_multi_comparison_subplots(x1 = type_dummy, x2 = education_2, y = pres
 single_multi_comparison_subplots()
 ```
 
+```{python}
+# generate the interactive plot
+def duncan_plotly_categorical(model = ["`prestige ~ education` \n(ignoring `type`)",
+                                       "`prestige ~ type` \n(ignoring `education`)",
+                                       "`prestige ~ type + education`"]):
+    ignore_type = "`prestige ~ education` \n(ignoring `type`)"
+    ignore_education = "`prestige ~ type` \n(ignoring `education`)"
+    adjust = "`prestige ~ type + education`"
+    if model == ignore_type:
+        plotly_3D_with_plane(dataset=duncan_bc_prof,
+                         x1_string='type_dummy',
+                         x2_string='education',
+                         y_string='prestige',
+                        hover_string_list=['name'],
+                        x1_slope=0,
+                        x2_slope=duncan_prestige_education_2_slope,
+                        intercept=duncan_prestige_education_2_intercept,
+                        model_title_string=ignore_type)
+    
+    elif model == ignore_education:
+        plotly_3D_with_plane(dataset=duncan_bc_prof,
+                         x1_string='type_dummy',
+                         x2_string='education',
+                         y_string='prestige',
+                        hover_string_list=['name'],
+                        x1_slope=duncan_prestige_type_slope,
+                        x2_slope=0,
+                        intercept=duncan_prestige_type_intercept,
+                        model_title_string=ignore_education)
+        
+    elif model == adjust:
+        plotly_3D_with_plane(dataset=duncan_bc_prof,
+                         x1_string='type_dummy',
+                         x2_string='education',
+                         y_string='prestige',
+                        hover_string_list=['name'],
+                        x1_slope=duncan_prestige_type_education_type_slope,
+                        x2_slope=duncan_prestige_type_education_ed_slope,
+                        intercept=duncan_prestige_type_education_intercept,
+                        model_title_string=adjust)
+interact(duncan_plotly_categorical)
+```
+
 ## Statistical adjustment, with the EPL data, continuous predictors
 
 
