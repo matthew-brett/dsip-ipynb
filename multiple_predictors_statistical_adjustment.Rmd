@@ -13,30 +13,41 @@ jupyter:
     name: python3
 ---
 
-# Multiple Predictor Linear Regression Models
+# Statistical Adjustment in Multiple Predictor Linear Regression Models
 
-[Page will use both Duncan data and EPL data]
+On previous pages, we've seen how to include multiple predictors in our linear regression models. The main advantage of doing this is that it lets us adjust our parameter estimate for one predictor variable in light of other predictor variables. This page will explore more deeply what this concept means and will aim to give you a graphical and statistical intuition for the process. 
 
-[Will cover some content which is on the other pages]
+Recall the English Premier League dataset which we saw [previously](https://lisds.github.io/dsip/epl_modeling.html) has data on English Premier League football clubs. A data scientist may want to get an estimate of the relationship between spending on `forwards` (attacking players) and `goal_difference` (an index of how well the team is performing). Remember that if we only include one predictor in a model, then our estimate will *ignore* other potentially relevant predictor variables. Our data scientist may want to *adjust* their estimate in light of other predictor variables, like spending on `defense` (defending players). This will let our data scientists make statements like "based on our model and the relationships in the data, if two teams spent the same on `defense`, but differed only by one unit in `forward` spending, we would predict that their `goal_difference` would differ by $b$" (where $b$ is the slope for `forward` spending).  
 
-Structure:
+You might see this process referred to as "statistical contol" in phrases like "*controlling* for predictor variable A, we estimate the slope between predictor B and the outcome variable is...". We'll use the phrase "statistical adjustment" instead, as it refers to the same thing, but to us it keeps the terminology closer to what is actually happening at the level of the model fitting.
 
-Duncan data:
-- regression models with continuous predictors
+Some of the content from this page is touched upon towards end of the other pages, where including multiple predictors was covered, but this page will focus specifically on the topic and offers a more in-depth treatment.
 
-Statistical adjustment:
-- EPL data
+For this page we will use both the Duncan dataset and the English Premier League (EPL) dataset which we have seen previously.
 
-Duncan data:
-- regression models with categorical and continuous predictors
+- we will use the Duncan data and the EPL data to explore statistical adjustment when using numerical predictor variables
+- we will use the Duncan data to explore statistical adjustment when using numerical AND categorical predictor variables
+- we will use the Duncan data to explore statistical adjustment whent using ONLY categorical predictor variables
 
-Model naming convention for this notebook:
+Because we will be fitting so many models on this page, we will use the following naming convention for each model (e.g. when the model object from `statsmodels` is stored as a python variable:
 
 `dataset_outcome_predictor1_predictor2`
 
+So the text before the first underscore will tell us which dataset the model is fit to (e.g. Duncan or EPL), the text between the first and second underscore will tell us what the outcome variable is,and the text between the underscores at the end of the string will tell us what the predictor variables are.
+
+So for instance, a model fit to the Duncan data, with `prestige` as an outcome and `income` and `education` as predictors (`prestige ~ income + education`) will be stored as a python variable called:
+
 `duncan_prestige_income_education`
 
+Likewise, a model fit to the EPL data, with `goal_difference` as an outcome and `forward` and `defense` as predictors (`goal_difference ~ forward + defense`) will be written as:
+
 `epl_goaldiff_forward_defense`
+
+#### Structure of each section on this page
+
+For each section on this page, we will fit two separate linear regression models. Each of these models will *ignore* the predictor variable used in the other model. We will then combine the predictors in the same multi-predictor model, and see how this affects the parameter estimates (the slopes), so that we can see the process of statistical adjustment in action. 
+
+First, let's import the libraries we will need for this page:
 
 ```{python}
 # Import numerical and plotting libraries
@@ -69,6 +80,23 @@ def ss_two_predictors(bs_and_c, x1_vector, x2_vector, y_vector):
     return np.sum(error ** 2)
 ```
 
+Let's read in the Duncan data, for convenience the descriptions of the variables are shown again below:
+
+* `name` - the name of the occupation, from the 1950 US Census
+* `type`- type of occupation, with the following categories ``prof``,
+  professional and managerial; ``wc``, white-collar; ``bc``, blue-collar. (E.g.
+  how the occupation was classified in the 1950 US Census)
+* `income` - percentage of census respondents within the occupation who earned
+  3,500 dollars or more per year (about 36,000 US dollars in 2017)
+* `education` - percentage of census respondents within the occupation who were
+  high school graduates 
+* `prestige` - percentage of respondents in the NORC survey who rated the
+  occupation as “good” or better in prestige
+
+See [the dataset
+page](https://github.com/odsti/datasets/tree/main/duncan_occupations) for more
+detail.
+
 ```{python}
 # read in the data
 duncan = pd.read_csv("data/Duncan_Occupational_Prestige.csv")
@@ -77,18 +105,27 @@ duncan = pd.read_csv("data/Duncan_Occupational_Prestige.csv")
 duncan
 ```
 
+We'll be using the full dataset, of 45 occupations. As before, let's
+store some of the vectors drom the dataframe as separate python variables,
+so that we can use them more handily:
+
 ```{python}
+# store the `prestige` vector
 prestige = duncan['prestige'].values
 
+# store the `education` vector
 education = duncan['education'].values
 
+# store the `income` vector
 income = duncan['income'].values
 ```
 
 ## Statistical adjustment, with the Duncan data, continuous predictors
 
+Let's run the cell below, to define some custom plotting functions for this page:
+
 ```{python}
-# do not worry about this code, it is just a convenience function to plot the data
+# do not worry about the code in this cell, these are just convenience functions to generate plots
 def make_scatter(with_errors=False,
                  show=False,
                  return_errors=False,
@@ -155,9 +192,11 @@ def make_3d_scatter(x1, x2, y,
                    show = True,
                    plane_alpha = 0.5,
                    model_string ='',
-                   round_to=2):
+                   round_to=2,
+                   fig_size=(8,8)):
+    # Create 3D scatterplot
     sum_sq = ss_two_predictors([x1_slope, x2_slope, c], x1, x2, y)
-    ax = plt.figure(figsize=(8,8)).add_subplot(111, projection='3d')
+    ax = plt.figure(figsize=fig_size).add_subplot(111, projection='3d')
     ax.scatter(x1,x2,y, label = 'Actual values ($y$)')
     ax.set_xlabel(x1_label)
     ax.set_ylabel(x2_label)
@@ -182,18 +221,18 @@ def make_3d_scatter(x1, x2, y,
                     linestyle=':',
                     linewidth=0.5,
                     color='black')
-    # add labels to error
+    # Add labels to error
     ax.plot([], [], [],
         linestyle=':',
         linewidth=0.5,
         color='black',
         label = 'Errors ($ \\varepsilon $)')
-    # Set the axis limits (and reverse y axis)
+    # Set the axis limits
     ax.set_xlim(min_x1, mx_x1)
     ax.set_ylim(min_x2, mx_x2)
     ax.set_zlim(min_y, mx_y)
     ax.zaxis.labelpad=-3
-    # show the legend
+    # Show the legend and title
     plt.legend()
     plt.title(model_string+f"\n$b_1$ = {round(x1_slope,round_to)} \n$b_2$ = {round(x2_slope,round_to)} \n$c$ = {round(c,round_to)} \n Sum of Squared Error = {round(sum_sq, 2)}")
     if show == True:
@@ -206,7 +245,7 @@ def make_3d_scatter(x1, x2, y,
         return errors 
 
 # some convenience plotting functions
-def plot_model_3D(x1_slope, x2_slope, c, return_errors = True):
+def plot_model_3D(x1_slope, x2_slope, c, return_errors = True, fig_size = (8, 8)):
     errors = make_3d_scatter(education, income, prestige,
                x1_slope = x1_slope, 
                x2_slope = x2_slope,
@@ -214,31 +253,55 @@ def plot_model_3D(x1_slope, x2_slope, c, return_errors = True):
                return_errors = return_errors,
                x1_label="Education",
                x2_label="Income",
-               y_label="Prestige")
+               y_label="Prestige",
+               fig_size=fig_size)
     return errors
 ```
 
 ### Prestige ~ Education
 
+Let's fit one of the models we've seen before, showing the linear relationship between `prestige` and `education`, if we ignore `income`. E.g. if we fit a single-predictor linear regression of the form `prestige ~ education`.
+
+We'll use the `statsmodels.formula` library to fit our model, using the syntax we've seen previously (this is a very useful interface for quickly fitting and comparing lots of different models).
+
+We'll save the model as `duncan_prestige_education`, which, as detailed above, we can read as "a model fit to the Duncan dataset, with `prestige` as an outcome and `education` as a predictor:
+
 ```{python}
+# fit our first model (`prestige` ~ `education`)
 duncan_prestige_education = smf.ols('prestige ~ education', data = duncan).fit()
 
-duncan_prestige_education.summary(slim = True)
+# show the summary of our model (`slim=True` gives us a briefer summary of the model)
+duncan_prestige_education.summary(slim=True)
 ```
 
+For all the `statsmodels` summary tables we see on this page, the most important part to attend to is the `coef` column, which is highlighted in red below:
+
+![](images/stat_table.png)
+
+The numbers here are our parameter estimates (they are different to the slope/intercept we obtained when we fit this model to the first 15 rows of the Duncan dataset previously).
+
+Let's pull out the slope and intercept from this model, and store them as separate variables:
+
 ```{python}
+# get the slope, from the statsmodels model object
 duncan_prestige_education_slope = duncan_prestige_education.params['education']
 
+# show the slope
 duncan_prestige_education_slope
 ```
 
 ```{python}
+# get the intercept, from the statsmodels model object
 duncan_prestige_education_intercept = duncan_prestige_education.params['Intercept']
 
+# show the intercept
 duncan_prestige_education_intercept
 ```
 
+Let's plot the data and the fitted values from the model. (*Note:* normally it is best practice to plot the data *before* fitting a model, but we'll be fitting lots of models on this page, and the emphasis is on statistical adjustment, so to save time we will plot the model and the data together, in the first instance):
+
 ```{python}
+# do not worry about this code, it is just a convenience function to generate the plot
 def plot_prestige_education(continuous_line=False):
     make_scatter(x=education,
     y=prestige,
@@ -253,44 +316,83 @@ def plot_prestige_education(continuous_line=False):
 plot_prestige_education()
 ```
 
+We can see that, ignoring `income`, there is a clear linear relationship between `education` and `prestige`.
+As with any single-predictor linear regression, the slope of the predictor (`education`) has not been adjusted
+in light of any of the other predictor variables.
+
+Now, let's fit another single-predictor linear regression, describing the linear releationship between `income`
+and `prestige`. Again, this regression will *not* adjust it's estimate of the slope between `income` and `education`
+in light of any other predictor variables.
+
+Before we fit this second model however, let's define a function that will fit the model for us.
+We'll be fitting lots of models on this page, and a good principle when coding is "don't repeat yourself".
+E.g. if you will be using the same procedure many times, write a function to do it:
+
 ```{python}
+# a function to fit a single predictor linear regression, using the `statsmodels.formula` library
 def fit_single_pred_model(model_spec_string,
                           dataset,
                           slope_name,
                           slim_summary = True):
-
+    """A function to fit a single predictor linear regression,
+    using the `statsmodels.formula` library
+    """
+    
+    # fit the model, based on the `model_spec_string`, and the `dataset`
     model = smf.ols(model_spec_string, data = dataset).fit()
     
-    display(model.summary(slim = slim_summary))
+    # show the (slim) model summary
+    display(model.summary(slim=slim_summary))
     
+    # store the intercept
     intercept = model.params['Intercept']
     
+    # store the slope
     slope = model.params[slope_name]
     
+    # return the model object, the intercept and the slope
     return model, intercept, slope
 
+# test the function, with the model we just fitted (`prestige ~ education`)
 test_model, test_intercept, test_slope = fit_single_pred_model('prestige ~ education',
                                                                duncan,
                                                                'education')
 ```
 
+To "sanity check" our function, the two cells below test the intercept/slope
+that we get from our function against those we stored earlier.
+
+If the tests pass, the cells will run withour producing an error, 
+in which case our function has returned the same parameter estimates
+as those we stored earlier.
+
 ```{python}
+# test the intercept
 assert test_intercept == duncan_prestige_education_intercept
 ```
 
 ```{python}
+# test the slope
 assert test_slope == duncan_prestige_education_slope
 ```
 
 ### Prestige ~ Income
 
+Now, let's look at the unadjusted slope for a linear regression predicting `prestige` from `income`.
+
+We'll use the function we just defined. The expression the left hand side of the `=` just implements the unpacking process we've seen previously. Our function returns three elements (the model, the intercept and the slope). Placing these three elements between parantheses `()` just let's us split the code over multiple lines, to make it more readable:
+
 ```{python}
+# fit the `prestige ~ income` model
 (duncan_prestige_income,
  duncan_prestige_income_intercept,
  duncan_prestige_income_slope) = fit_single_pred_model('prestige ~ income', duncan, slope_name = 'income')
 ```
 
+Let's plot the data and the fitted values from the `prestige ~ income` model:
+
 ```{python}
+# another convenience plotting function
 def plot_prestige_income(continuous_line=False):
     make_scatter(x=income,
     y=prestige,
@@ -305,9 +407,67 @@ def plot_prestige_income(continuous_line=False):
 plot_prestige_income()
 ```
 
-### Prestige ~ Education + Income
+We can see that there is a clear linear relationship between `income` and `prestige`. Note again that the slope has *not* been adjusted with reference to other potential predictor variables (like `education`).
+
+So, now we have two models:
+
+`prestige ~ education`
+
+and
+
+`prestige ~ income`
+
+Let's include them in the same model, and see how the adjustment process works (e.g. what happens to the slope of each predictor when we statistically adjust each slope in light of the other predictor variable).
+
+First, let's show the data in 3D. This plot shows `prestige` as a function of `education` and `income`.
+To keep things simple, we'll refer to each axis by the name of the predictor that it shows.
+
+So, the first horizontal axis is the `education` axis.
+The second horizontal axis is the `income` axis.
+The vertical axis is the `prestige` axis.
 
 ```{python}
+# do not worry about the details of this code, it just generates the 3D scatter plot
+def basic_3D_scatter():
+    fig = plt.figure(figsize = (8, 8))
+    ax = fig.add_subplot(projection='3d')
+    ax.scatter(education, income, prestige)
+    ax.set_xlabel('Education')
+    ax.set_ylabel('Income')
+    ax.set_zlabel('Prestige')
+    ax.zaxis.labelpad=-3
+    plt.show()
+    
+basic_3D_scatter()
+```
+
+Just as on the scattplots we've seen that show two variables, each datapoint represents one occupation (one observational unit).
+
+The `education` axis location of each datapoint is given by the `education` score of that observational unit.
+The `income` axis location of each datapoint is given by the `income` score of that observational unit.
+The `prestige` axis location of each datapoint is given by the `prestige` score of that observational unit.
+
+Let's remind ourselves what is happening when we fit a linear regression model with two predictors.
+With two predictors, we are fitting a *plane* (like a sheet of paper) rather than a *line*. The model
+is still linear though, for reasons we are about to see.
+
+First, let's remind ourselves what "fitting a plane" looks like.
+
+If you are using this page interactively, you can change the slope for `education`, the slope for `income` and the intercept, to see how this affects the location/orientation of the plane, and the value of the cost function (the sum of squared error).
+
+The full vector notation for the model is also shown below the plot (though as we are using 45 observational units now, it is hard to read - you may have to zoom out!).
+
+**Note**: we really recommend spending some time interacting with this plot, in the following manner:
+
+- adjust the intercept only, see how this affects the plane
+- adjust the `education_slope` only, see how this affects the plane (ensure the `income_slope` is set to 0)
+- adjust the `income_slope` only, see how this affects the plane (ensure the `education_slope` is set to 0)
+- set both the slopes to nonzero values, and then experiment with the sign of each slope (make one positive, and the other negative etc.)
+
+Being able to understand the meaning of the slopes in 3D is **key** to getting a graphical intuition for statistical adjustment, so please do experiment with this plot:
+
+```{python}
+# do not worry about this code, it just generates the interactive plot
 def interactive_plane_fitter(education_slope, income_slope, intercept):
 
     # calculate the fitted values, for this combination of parameter estimates
@@ -320,14 +480,106 @@ def interactive_plane_fitter(education_slope, income_slope, intercept):
     errors3d_from_guesses = plot_model_3D(x1_slope = education_slope, 
                                         x2_slope = income_slope,
                                         c = intercept,
-                                        return_errors = False)
+                                        return_errors = False,
+                                        fig_size = (6, 6))
 
     # do not worry about this code, it just prints the mathematical notation below this cell
     jupyprint(f"${arraytex(np.atleast_2d(fitted + errors).T)} = {round(education_slope, 2)} * {arraytex(np.atleast_2d(education).T)} + {round(income_slope, 2)} * {arraytex(np.atleast_2d(income).T)} + {round(intercept, 2)} + {arraytex(np.atleast_2d(errors).round(2).T)}$")
     jupyprint(f"The sum of the squared errors for this combination of parameter estimates is <b> {np.sum(errors**2)} </b>")
     
-interact(interactive_plane_fitter, education_slope = (-1, 1, 0.1), income_slope = (-1, 1, 0.1), intercept = (-10, 10, 0.1))
+interact(interactive_plane_fitter, education_slope = (-2, 2, 0.1), income_slope = (-2, 2, 0.1), intercept = (-100, 100, 0.1))
 ```
+
+Now, we've given ourselves a good graphical intuition for the fitting of a plane, here is another **key** cornerstore of understanding statistical adjustment, from a graphical perspective.
+
+The distribution of points on the 3D scatterplot is *fixed* - it is given by the values in our dataset.
+
+The 3D distribution of points exists **irrespective of our model**.
+
+So, if we fit a model that only factors in one predictor variable and ignores the other, the distribution of points on the 3D scatter remains unchanged:
+
+```{python}
+# generate the 3D scatter
+basic_3D_scatter()
+```
+
+Now, on the interactive scatterplot we just used above, we can set one of the slopes to 0.
+
+We could then set the other slope and the intercept to be the value of the slope and the intercept that we got from a single-predictor linear regression.
+
+So for instance, we could set the `income_slope` to 0, and then we could set the `education_slope` and the `intercept` to be the values we got from our single-predictor linear regression (`prestige ~ education`).
+
+Let's remind ourselves of these values:
+
+```{python}
+# show the `prestige ~ education` intercept
+duncan_prestige_education_intercept
+```
+
+```{python}
+# show the `prestige ~ education` slope
+duncan_prestige_education_slope
+```
+
+Please feel free to try and input these values on the interactive scatterplot above, but make sure you set the `income_slope` to 0.
+
+The output of the code cell below shows the graph we obtain from these "settings" - the value of the slopes and intercept are shown above the plot. Please compare them to the values shown in the two cells above this cell.
+
+$b_1$ is the slope for the `education` axis.
+$b_2$ is the slope for the `income` axis (it is set to 0 in this case)
+$c$ is the value of the intercept:
+
+```{python}
+make_3d_scatter(x1=education,
+                x2=income, 
+                y=prestige,
+                x1_slope=duncan_prestige_education_slope,
+                x2_slope=0,
+                c=duncan_prestige_education_intercept,
+                model_string='Prestige ~ Education',
+                round_to=8,
+                x1_label='Education',
+                x2_label='Income',
+                y_label = 'Prestige')
+```
+
+Now, we'd like you to imagine the scatterplot as a physical object. Maybe it could be an exhibit in an art gallery, or maybe a 3D hologram in a fancy data visualisation space.
+
+Now imagine you were standing on the `education` axis, facing the "back wall" of the plot, something like this somewhat ghostly figure shown below (the direction the figure is looking in is shown by a blue arrow):
+
+![](images/stat_adjust_duncan_ed.png)
+
+Now, if we assume you had quite bad depth perception, and were standing at exactly the right place on the `education` axis, you would see something like this (where the dashed red line would be the "edge" of the regression plane):
+
+```{python}
+# generate the perspective you would see, standing on the `education` axis
+plot_prestige_education(continuous_line=True)
+```
+
+Please scroll back and forth between this plot, and the plot above (with the image of the figure standing on the `education` axis) - until you are convinced by this.
+
+The key message is this: **a line can be thought of as a 2D "slice" of a 3D plane**.
+
+So, we can take the parameter estimates (the slope $b$ and the intercept $c$) from a single-predictor linear regression (like `prestige ~ education`), and show them on a 3D plot. We do this by setting the slope of the other predictor (in this case `income`) to 0 - this is the same as not including `income` in the model.
+
+If you compare the value of the sum of the squared error shown above the last two scatterplots, you will see that it is the same, whether we shown linear regression as a line in 2D or as a plane in 3D.
+
+**Pause for thought**: let's pause here to make sure we really understand these concepts, as they are somewhat tricky/mind-bendy at first.
+
+It is very important to understand these concepts before we proceed:
+
+- fitting a single predictor linear regression *ignores* other predictor variables in the dataset
+- the parameter estimates (the slope $b$ and the intercept $c$) from the single predictor linear regression can be shown as a line in 2D, or as a plane in 3D
+- if we show them as a plane in 3D, and the slope of the other predictor is 0, we get *exactly* the same errors as for the 2D line
+
+This process let's us show a single-predictor linear regression in 3D, by *ignoring* the other predictor.
+
+We can then see how the regression plane looks *when we do **not** statistically adjust for the other predictor*.
+
+We will now fit a multi-predictor linear regression model, so we can see how the process of statistical adjustment affects the regression plane.
+
+
+### Prestige ~ Education + Income
 
 ```{python}
 duncan_prestige_education_income = smf.ols('prestige ~ education + income', data = duncan).fit()
