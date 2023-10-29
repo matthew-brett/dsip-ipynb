@@ -174,7 +174,6 @@ def make_scatter(with_errors=False,
         jupyprint(f"The sum of the squared error is <b> {round(np.sum((errors)**2),2)}. </b>")
         return errors 
  
-# some other convenience functions
 def make_scatter_line_comparison(b, c):
     # Call the make_scatter function with some defaults.
     errors = make_scatter(with_errors = True,
@@ -295,7 +294,6 @@ def plotly_3D_with_plane(dataset, x1_string, x2_string, y_string, hover_string_l
     # show the plot
     scatter_3d.show()
 
-# some convenience plotting functions
 def plot_model_3D(x1_slope, x2_slope, c, return_errors = True, fig_size = (8, 8), round_to=4):
     errors = make_3d_scatter(education, income, prestige,
                x1_slope = x1_slope, 
