@@ -253,7 +253,8 @@ def make_3d_scatter(x1, x2, y,
         return errors 
     
 def plotly_3D_with_plane(dataset, x1_string, x2_string, y_string, hover_string_list,
-                         x1_slope, x2_slope, intercept, model_title_string=''):
+                         x1_slope, x2_slope, intercept, model_title_string='',
+                        x1_1_or_0=False):
     """Interactive 3D scatter, via plotly."""
     # create the scattplot
     scatter_3d = px.scatter_3d(dataset, x=x1_string, y=x2_string, z=y_string,
@@ -263,7 +264,7 @@ def plotly_3D_with_plane(dataset, x1_string, x2_string, y_string, hover_string_l
     x2 = scatter_3d.data[0].y
     x1, x2 = np.meshgrid(x1, x2)
     y = x1_slope * x1 + x2_slope * x2 + intercept
-    scatter_3d.add_trace(go.Surface(x=x1, y=x2, z=y, opacity=0.1))
+    scatter_3d.add_trace(go.Surface(x=x1, y=x2, z=y, opacity=0.4))
     
     # generate fitted values 
     predicted_values = intercept + x1_slope * scatter_3d.data[0].x + x2_slope * scatter_3d.data[0].y
@@ -285,6 +286,9 @@ def plotly_3D_with_plane(dataset, x1_string, x2_string, y_string, hover_string_l
     scatter_3d.update_layout(scene={'camera': {'up': {'x': 0, 'y': 0, 'z': 1},
                                     'center': {'x': 0, 'y': 0, 'z': 0},
                                     'eye': {'x': 1.6, 'y': -1.6, 'z': 0.6}}})
+    if x1_1_or_0==True:
+        scatter_3d.update_layout(scene = {'xaxis': {"tickvals":[0, 1]}})
+    
     # show the plot
     scatter_3d.show()
 
@@ -1192,6 +1196,18 @@ def single_multi_comparison_subplots(x1 = type_dummy, x2 = education_2, y = pres
 single_multi_comparison_subplots()
 ```
 
+![](images/stat_adjust_duncan_type_ed.png)
+
+```{python}
+make_scatter(education_2, prestige_2, duncan_prestige_education_2_slope, duncan_prestige_education_2_intercept)
+```
+
+![](images/stat_adjust_duncan_type_ed.png)
+
+```{python}
+with_errors_categorical(duncan_prestige_type_slope, duncan_prestige_type_intercept)  
+```
+
 ```{python}
 # generate the interactive plot
 def duncan_plotly_categorical(model = ["`prestige ~ education` \n(ignoring `type`)",
@@ -1209,7 +1225,8 @@ def duncan_plotly_categorical(model = ["`prestige ~ education` \n(ignoring `type
                         x1_slope=0,
                         x2_slope=duncan_prestige_education_2_slope,
                         intercept=duncan_prestige_education_2_intercept,
-                        model_title_string=ignore_type)
+                        model_title_string=ignore_type,
+                        x1_1_or_0=True)
     
     elif model == ignore_education:
         plotly_3D_with_plane(dataset=duncan_bc_prof,
@@ -1220,7 +1237,8 @@ def duncan_plotly_categorical(model = ["`prestige ~ education` \n(ignoring `type
                         x1_slope=duncan_prestige_type_slope,
                         x2_slope=0,
                         intercept=duncan_prestige_type_intercept,
-                        model_title_string=ignore_education)
+                        model_title_string=ignore_education,
+                        x1_1_or_0=True)
         
     elif model == adjust:
         plotly_3D_with_plane(dataset=duncan_bc_prof,
@@ -1231,7 +1249,8 @@ def duncan_plotly_categorical(model = ["`prestige ~ education` \n(ignoring `type
                         x1_slope=duncan_prestige_type_education_type_slope,
                         x2_slope=duncan_prestige_type_education_ed_slope,
                         intercept=duncan_prestige_type_education_intercept,
-                        model_title_string=adjust)
+                        model_title_string=adjust,
+                        x1_1_or_0=True)
 interact(duncan_plotly_categorical)
 ```
 
