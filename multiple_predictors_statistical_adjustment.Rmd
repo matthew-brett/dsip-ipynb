@@ -988,27 +988,208 @@ First though, let's explore statistical adjustment in a multi-predictor linear r
 
 
 ```{python}
+# restrict analysis to just `bc` and `prof` occupations
 duncan_bc_prof = duncan[(duncan['type'] == 'bc') | (duncan['type'] == 'prof')].copy()
 
-duncan_bc_prof
+# show the dataframe, first 20 values
+duncan_bc_prof.head(20)
 ```
 
 ```{python}
-# store the prestige values as a variable 
-type_dummy = df['type'].replace(['prof', 'bc'], [0, 1]).values
+# create a dummy variable 
+duncan_bc_prof['type_dummy'] = duncan_bc_prof['type'].replace(['prof', 'bc'], [0, 1]).values
+
+# show the dataframe, first 20 values
+duncan_bc_prof.head(20)
+```
+
+```{python}
+duncan_bc_prof['type'].value_counts()
+```
+
+```{python}
+# store the type dummy as a variable
+type_dummy = duncan_bc_prof['type_dummy'].values
 
 # show the values
 type_dummy
 ```
 
 ```{python}
-duncan[duncan['type'] == 'bc']
+# get the `prestige` values, from the `duncan_bc_prof` dataframe
+prestige_2 = duncan_bc_prof['prestige'].values
+
+# show the values
+prestige_2
 ```
 
 ```{python}
-wc_dummy = duncan['type_wc'].values
+# get the `income` values, from the `duncan_bc_prof` dataframe
+education_2 = duncan_bc_prof['education'].values
 
-prof_dummy = duncan['type_prof'].values
+# show the values
+education_2
+```
+
+```{python}
+(duncan_prestige_type,
+ duncan_prestige_type_intercept,
+ duncan_prestige_type_slope)= fit_model(model_spec_string='prestige ~ type_dummy',
+                                  dataset=duncan_bc_prof,
+                                  slope_names_list=['type_dummy'])
+```
+
+```{python}
+# do not worry about this code, it is just some convenience plotting functions
+def simple_scatter_with_dummy():
+    plt.scatter(type_dummy, prestige_2)
+    plt.xticks([0, 1])
+    plt.xlabel('Type Dummy\n{0 = prof, 1 = bc}')
+    plt.ylabel('Prestige')
+    
+def with_errors_categorical(b, c, error_vector=False, show=True, show_model=False, round_to=4):
+    # create the scatterplot
+    simple_scatter_with_dummy()
+    # add a legend label for the datapoints
+    plt.scatter([], [], color = '#1f77b4', label='Actual values ($y$)')
+    # set the x axis to only show a "tick" at 0 and 1
+    plt.xticks([0, 1], labels = ["0 \n(prof)", "1 \n(blue collar)"])
+    # plot the fitted values, from b and c
+    plt.scatter([0, 1], [b * 0 + c, b * 1 + c],
+            color = 'red', label = 'Fitted values ($\hat{y}$)')
+    plt.plot(np.linspace(0, 1), b * np.linspace(0, 1) + c,
+         color = 'red', label = 'Regression line', linestyle='--')
+    fitted = b * type_dummy + c
+    # plot the distance between predicted and actual, for all points.
+    n = len(type_dummy)
+    for i in range(n):
+        plt.plot([type_dummy[i], type_dummy[i]], [fitted[i], prestige_2[i]], 'k:')
+    # the following code line is just to trick Matplotlib into making a new
+    # a single legend entry for the dotted lines.
+    plt.plot([], [], 'k:', label='Errors ($ \\varepsilon $)')
+    errors = prestige_2 - fitted
+    plt.legend()
+    plt.title(f"\n$b$ = {round(b, round_to)} \n$c$ = {round(c,round_to)} \n Sum of Squared Error = {round(sum(errors**2), round_to)}")
+    if show == True:
+        plt.show()
+    if error_vector == True:
+        jupyprint(f"Here is the error vector for the current line: {arraytex(np.atleast_2d(errors.round(round_to)).T)}")
+    if show_model == True:
+        jupyprint(f"${arraytex(np.atleast_2d(prestige_2.round(round_to)).T)} = {round(b, round_to)} * {arraytex(np.atleast_2d(type_dummy).T)} + {round(c, round_to)} + {arraytex(np.atleast_2d(prestige_2 - fitted).round(round_to).T)}$")
+    
+with_errors_categorical(duncan_prestige_type_slope, duncan_prestige_type_intercept)  
+```
+
+```{python}
+(duncan_prestige_education_2,
+ duncan_prestige_education_2_intercept,
+ duncan_prestige_education_2_slope)= fit_model(model_spec_string='prestige ~ education',
+                                  dataset=duncan_bc_prof,
+                                  slope_names_list=['education'])
+```
+
+```{python}
+# do not worry about this code it just generates the plot
+def make_scatter(x, y, b, c, with_errors = True, show = False,
+                 xlabel = 'Education',
+                 x_0_1 = False,
+                 rev_min_max = False,
+                 show_fitted = True,
+                 round_to=4):
+    plt.scatter(x, y, label='Actual values ($y$)')
+    # plot the predicted values
+    fitted = b * x + c
+    errors = y -fitted
+    if show_fitted == True:
+        plt.plot(x, fitted, 'ro', label='Fitted values from linear regression ($\hat{y}$)')
+    if rev_min_max == False:
+        plt.plot([x.min(), x.max()], [fitted.min(), fitted.max()], linestyle = '--', color = 'red')
+    if rev_min_max == True:
+        plt.plot([x.min(), x.max()], [fitted.max(), fitted.min()], linestyle = '--', color = 'red')
+    if with_errors == True:
+        # plot the distance between predicted and actual, for all points.
+        n = len(x)
+        for i in range(n):
+            plt.plot([x[i], x[i]], [fitted[i], y[i]], 'k:')
+        # the following code line is just to trick Matplotlib into making a new
+        # a single legend entry for the dotted lines.
+        plt.plot([], [], 'k:', label='Errors ($ \\varepsilon $)')
+    plt.xlabel(xlabel)
+    plt.ylabel('Prestige')
+    plt.title(f"\n$b$ = {round(b, round_to)} \n$c$ = {round(c,round_to)} \n Sum of Squared Error = {round(sum(errors**2), round_to)}")
+    if x_0_1 == True:
+        plt.xticks([0, 1])
+    # show the legend
+    plt.legend();
+    if show == True:
+        plt.show()
+make_scatter(education_2, prestige_2, duncan_prestige_education_2_slope, duncan_prestige_education_2_intercept)
+```
+
+```{python}
+(duncan_prestige_type_education,
+ duncan_prestige_type_education_intercept,
+ duncan_prestige_type_education_type_slope,
+duncan_prestige_type_education_ed_slope)= fit_model(model_spec_string='prestige ~ type_dummy + education',
+                                                    dataset=duncan_bc_prof,
+                                                    slope_names_list=['type_dummy', 'education'])
+```
+
+```{python}
+# do not worry about this code, it is just to generate the 3D plots
+def single_multi_comparison_subplots(x1 = type_dummy, x2 = education_2, y = prestige_2,
+                                     x1_label = 'Type\n{0 = prof, 1 = bc}',
+                                       x2_label = 'Education',
+                                       y_label = 'Prestige',
+                                       plane_alpha = 0.5,
+                                     round_to=4):
+    model_strings = ["`prestige ~ education` \n(ignoring `type`)",
+                     "`prestige ~ type` \n(ignoring `education`)",
+                     "`prestige ~ type + education`"]
+    fig, axes = plt.subplots(1, 3, figsize=(16, 10), subplot_kw={'projection': '3d'})
+   
+    for num, (subplot_val, x1_slope, x2_slope, c) in enumerate(zip([131, 132, 133],
+                                                        [0, duncan_prestige_type_slope, duncan_prestige_type_education_type_slope],
+                                                        [duncan_prestige_education_2_slope, 0, duncan_prestige_type_education_ed_slope],
+                                                        [duncan_prestige_education_2_intercept, duncan_prestige_type_intercept, duncan_prestige_type_education_intercept])):
+        sum_sq = ss_two_predictors([x1_slope, x2_slope, c], x1, x2, y)
+        ax = axes[num]
+        ax.scatter(x1,x2,y, label = 'Actual values ($y$)')
+        ax.set_xticks([0, 1])
+        ax.set_xlabel(x1_label)
+        ax.set_ylabel(x2_label)
+        ax.set_zlabel(y_label)
+        mx_x1 = x1.max()
+        mx_x2 = x2.max()
+        mx_y = y.max()
+        # Plot the fitting plane.
+        plane_x = np.linspace(0, mx_x1, 50)
+        plane_y = np.linspace(0, mx_x2, 50)
+        X, Y = np.meshgrid(plane_x, plane_y)
+        Z = c + x1_slope * X + x2_slope * Y
+        ax.plot_wireframe(X,Y,Z, color = 'red', label = 'Linear regression plane', alpha = plane_alpha)
+        # Plot lines between each point and fitting plane
+        for i in np.arange(len(y)):
+            x1_point, x2_point, actual = x1[i], x2[i], y[i]
+            fitted = c + x1_point * x1_slope + x2_point * x2_slope
+            ax.plot([x1_point, x1_point], [x2_point, x2_point], [fitted, actual],
+                    linestyle=':',
+                    linewidth=0.5,
+                    color='black')
+        # add labels to error
+        ax.plot([], [], [],
+            linestyle=':',
+            linewidth=0.5,
+            color='black',
+            label = 'Errors ($ \\varepsilon $)')
+        # Set the axis limits
+        ax.set_xlim(0, mx_x1)
+        ax.set_ylim(0, mx_x2)
+        ax.set_zlim(0, mx_y)
+        ax.set_title(f"{model_strings[num]}\n$b_1$ = {round(x1_slope,round_to)} \n$b_2$ = {round(x2_slope,round_to)} \n$c$ = {round(c,round_to)} \n Sum of Squared Error = {round(sum_sq, round_to)}")
+    plt.legend(loc = (1,  1))
+    
+single_multi_comparison_subplots()
 ```
 
 ## Statistical adjustment, with the EPL data, continuous predictors
