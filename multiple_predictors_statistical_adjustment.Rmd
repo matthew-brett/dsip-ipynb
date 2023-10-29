@@ -61,6 +61,10 @@ np.set_printoptions(precision=6)
 import statsmodels.formula.api as smf
 # For interactive widgets.
 from ipywidgets import interact
+# For interactive plotly graphs
+import plotly.express as px
+import plotly.graph_objects as go
+
 
 # cost function for two predictors (used internally in one of the 
 # plotting functions)
@@ -193,7 +197,9 @@ def make_3d_scatter(x1, x2, y,
                    plane_alpha = 0.5,
                    model_string ='',
                    round_to=4,
-                   fig_size=(8,8)):
+                   fig_size=(8,8),
+                   mx_y = ...,
+                   min_y = ...):
     # Create 3D scatterplot
     sum_sq = ss_two_predictors([x1_slope, x2_slope, c], x1, x2, y)
     ax = plt.figure(figsize=fig_size).add_subplot(111, projection='3d')
@@ -203,10 +209,12 @@ def make_3d_scatter(x1, x2, y,
     ax.set_zlabel(y_label)
     mx_x1 = x1.max()
     mx_x2 = x2.max()
-    mx_y = y.max()
+    if mx_y == ...:
+        mx_y = y.max()
     min_x1 = np.min([0, x1.min()])
     min_x2 = np.min([0, x2.min()])
-    min_y = np.min([0, y.min()])
+    if min_y == ...:
+        min_y = np.min([0, y.min()])
     # Plot the fitting plane.
     plane_x = np.linspace(0, mx_x1, 50)
     plane_y = np.linspace(0, mx_x2, 50)
@@ -243,6 +251,35 @@ def make_3d_scatter(x1, x2, y,
         jupyprint(f"Here is the error vector for the current regression plane: {arraytex(np.atleast_2d(errors.round(2)).T)}")
         jupyprint(f"The sum of the squared error is <b> {round(np.sum((errors)**2), 2)} </b>.")
         return errors 
+    
+def plotly_3D_with_plane(dataset, x1_string, x2_string, y_string, hover_string_list,
+                         x1_slope, x2_slope, intercept):
+    """Interactive 3D scatter, via plotly."""
+    # create the scattplot
+    scatter_3d = px.scatter_3d(dataset, x=x1_string, y=x2_string, z=y_string,
+                              hover_data= hover_string_list)
+    # generate the regression plane
+    x1 = scatter_3d.data[0].x
+    x2 = scatter_3d.data[0].y
+    x1, x2 = np.meshgrid(x1, x2)
+    y = x1_slope * x1 + x2_slope * x2 + intercept
+    scatter_3d.add_trace(go.Surface(x=x1, y=x2, z=y, opacity=0.1))
+    
+    # generate fitted values 
+    predicted_values = intercept + x1_slope * scatter_3d.data[0].x + x2_slope * scatter_3d.data[0].y
+    
+    # calculate errors
+    errors = scatter_3d.data[0].z - predicted_values
+    
+    # add errors to the plot
+    for i in np.arange(len(dataset)):
+        scatter_3d.add_trace(go.Scatter3d(x = [scatter_3d.data[0].x[i], scatter_3d.data[0].x[i]],
+                                          y = [scatter_3d.data[0].y[i], scatter_3d.data[0].y[i]],
+                                          z = [scatter_3d.data[0].z[i], predicted_values[i]],
+                                          mode='lines', showlegend=False,
+                                          line={'color': 'black', 'dash':'dash'}))
+    # show the plot
+    scatter_3d.show()
 
 # some convenience plotting functions
 def plot_model_3D(x1_slope, x2_slope, c, return_errors = True, fig_size = (8, 8), round_to=4):
@@ -758,7 +795,9 @@ def single_multi_comparison_subplots(x1 = education, x2 = income, y = prestige,
                                        x1_0_and_1 = False,
                                        x2_0_and_1 = False,
                                        round_to = 4,
-                                        model_strings = ["`prestige ~ education` \n(ignoring `income`)",
+                                       mx_y=...,
+                                       min_y=...,
+                                       model_strings = ["`prestige ~ education` \n(ignoring `income`)",
                                                          "`prestige ~ income` \n(ignoring `education`)",
                                                          "`prestige ~ education + income`"],
                                     x1_slopes=[duncan_prestige_education_slope, 0, duncan_prestige_education_income_ed_slope],
@@ -785,10 +824,12 @@ def single_multi_comparison_subplots(x1 = education, x2 = income, y = prestige,
         ax.set_zlabel(y_label)
         mx_x1 = x1.max()
         mx_x2 = x2.max()
-        mx_y = y.max()
+        if mx_y == ...:
+            mx_y = y.max()
         min_x1 = np.min([0, x1.min()])
         min_x2 = np.min([0, x2.min()])
-        min_y = np.min([0, y.min()])
+        if min_y == ...:
+            min_y = np.min([0, y.min()])
         # plot the fitting plane.
         plane_x = np.linspace(min_x1, mx_x1, 50)
         plane_y = np.linspace(min_x2, mx_x2, 50)
@@ -855,15 +896,36 @@ The first two plots show us the *unadjusted* estimates of the linear relationshi
 
 The reason that the "view from one of the axes" for the first two graphs is *identical* to the 2D scatterplot, is that the single-predictor model **ignores information from the other predictor**. So the regression line (or plane, in 3D) is fit only **with reference to the distance from the points along one axis**.
 
-Look at the difference between the regression planes of the first two plots (unadjusted estimates, ignoring the other predictor) and the regression plane on the third plot (**adjusted** estimates, taking into account the other predictor):
+Look at the difference between the regression planes of the first two plots (unadjusted estimates, ignoring the other predictor) and the regression plane on the third plot (**adjusted** estimates, taking into account the other predictor).
+
+*Note*: for better viewing, we highly recommend right clicking on the plot and opening it in a new tab...
 
 ```{python}
 # generate the plot
 single_multi_comparison_subplots()
 ```
 
-This is the process of statistical adjustment.
+```{python}
 
+```
+
+<!-- #region -->
+This is the process of statistical adjustment. The fitting process takes into account other predictor variables, rather than ignoring them.
+
+This let's us make statements like:
+
+
+- "based on our model and data, if we compared two observational units that differed only by one unit on `education`, and had the same `income` score, we would predict their difference in `prestige` to be $b_1$" (where $b_1$ is the slope for `education`)
+
+
+- "based on our model and data, if we compared two observational units that differed only by one unit on `income`, and had the same `education` score, we would predict their difference in `prestige` to be $b_2$" (where $b_2$ is the slope for `income`)
+
+In the present case, we can clearly see the regression plane for the two-predictor model (`prestige ~ education + income`) has been adjusted relative to the regression planes for the single predictor models. (Just to note again, for each single-predictor model, the slope of the other predictor is set to 0, which is means it is ignored, the plane does not take into account information from the other predictor).
+
+Statistical adjustment in this case has affect the *magnitude* but not the direction (the +/- sign) of the slope of each predictor. 
+
+However, statistical adjustment *can* also affect the direction of the slope, as we will now see.
+<!-- #endregion -->
 
 ## Statistical adjustment, with the EPL data, continuous predictors
 
@@ -906,7 +968,7 @@ def plot_goaldiff_forward(continuous_line=False):
     continuous_line=continuous_line,
     round_to=4)
     
-plot_goaldiff_forward()
+plot_goaldiff_forward(continuous_line=True)
 ```
 
 ## Goal Difference ~ Defense
@@ -932,7 +994,7 @@ def plot_goaldiff_defense(continuous_line=False):
     continuous_line=continuous_line,
     round_to=4)
     
-plot_goaldiff_defense()
+plot_goaldiff_defense(continuous_line=True)
 ```
 
 ## Goal Difference ~ Forward + Defense
@@ -957,7 +1019,9 @@ make_3d_scatter(x1=forward,
                 x2_label='Defense Spending',
                 y_label = 'Goal Difference',
                 model_string='Goal Difference ~ Forward Spending + Defense Spending', 
-                round_to=4)
+                round_to=4,
+                mx_y=100,
+                min_y=-100)
 ```
 
 ```{python}
@@ -968,6 +1032,8 @@ single_multi_comparison_subplots(x1=forward,
                                  x2_label='Defense Spending',
                                  y_label='Goal Difference',
                                  round_to=4,
+                                 mx_y=100,
+                                 min_y=-100,
                                  model_strings = ["`goal_difference ~ forward` \n(ignoring `defense`)",
                                                          "`goal_difference ~ defense` \n(ignoring `forward`)",
                                                          "`goal_difference ~ forward + defense`"],
@@ -978,13 +1044,11 @@ single_multi_comparison_subplots(x1=forward,
 ```
 
 ```{python}
-import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
-
-scatter_3d = px.scatter_3d(epl, x='forward', y='defense', z='goal_difference')
-
-scatter_3d.show()
+# generate the plot
+plotly_3D_with_plane(epl, 'forward', 'defense', 'goal_difference', ['team'],
+                     epl_goaldiff_forward_defense_slope_forw,
+                    epl_goaldiff_forward_defense_slope_def,
+                    epl_goaldiff_forward_defense_intercept)
 ```
 
 ## Statistical adjustment, with the Duncan data, continuous and categorical predictors
