@@ -13,7 +13,7 @@ jupyter:
     name: python3
 ---
 
-# Statistical Adjustment in Multiple Predictor Linear Regression Models
+# Statistical Adjustment in Multi-predictor Linear Regression Models
 
 On previous pages, we've seen how to include multiple predictors in our linear regression models. The main advantage of doing this is that it lets us adjust our parameter estimate for one predictor variable in light of other predictor variables. This page will explore more deeply what this concept means and will aim to give you a graphical and statistical intuition for the process. 
 
@@ -199,12 +199,15 @@ def make_3d_scatter(x1, x2, y,
                    round_to=4,
                    fig_size=(8,8),
                    mx_y = ...,
-                   min_y = ...):
+                   min_y = ...,
+                   x1_1_or_0=False):
     # Create 3D scatterplot
     sum_sq = ss_two_predictors([x1_slope, x2_slope, c], x1, x2, y)
     ax = plt.figure(figsize=fig_size).add_subplot(111, projection='3d')
     ax.scatter(x1,x2,y, label = 'Actual values ($y$)')
     ax.set_xlabel(x1_label)
+    if x1_1_or_0 == True:
+        ax.set_xticks([0, 1])
     ax.set_ylabel(x2_label)
     ax.set_zlabel(y_label)
     mx_x1 = x1.max()
@@ -1035,6 +1038,8 @@ education_2 = duncan_bc_prof['education'].values
 education_2
 ```
 
+## Prestige ~ Type (ignoring Education)
+
 ```{python}
 (duncan_prestige_type,
  duncan_prestige_type_intercept,
@@ -1048,7 +1053,7 @@ education_2
 def simple_scatter_with_dummy():
     plt.scatter(type_dummy, prestige_2)
     plt.xticks([0, 1])
-    plt.xlabel('Type Dummy\n{0 = prof, 1 = bc}')
+    plt.xlabel('Type \n{0 = prof, 1 = bc}')
     plt.ylabel('Prestige')
     
 def with_errors_categorical(b, c, error_vector=False, show=True, show_model=False, round_to=4):
@@ -1083,6 +1088,8 @@ def with_errors_categorical(b, c, error_vector=False, show=True, show_model=Fals
     
 with_errors_categorical(duncan_prestige_type_slope, duncan_prestige_type_intercept)  
 ```
+
+## Prestige ~ Education (Ignoring Type)
 
 ```{python}
 (duncan_prestige_education_2,
@@ -1130,6 +1137,8 @@ def make_scatter(x, y, b, c, with_errors = True, show = False,
 make_scatter(education_2, prestige_2, duncan_prestige_education_2_slope, duncan_prestige_education_2_intercept)
 ```
 
+## Prestige ~ Type + Education
+
 ```{python}
 (duncan_prestige_type_education,
  duncan_prestige_type_education_intercept,
@@ -1137,6 +1146,20 @@ make_scatter(education_2, prestige_2, duncan_prestige_education_2_slope, duncan_
 duncan_prestige_type_education_ed_slope)= fit_model(model_spec_string='prestige ~ type_dummy + education',
                                                     dataset=duncan_bc_prof,
                                                     slope_names_list=['type_dummy', 'education'])
+```
+
+```{python}
+make_3d_scatter(x1=type_dummy,
+                x2=education_2, 
+                y=prestige_2,
+                x1_slope=duncan_prestige_type_education_type_slope,
+                x2_slope=duncan_prestige_type_education_ed_slope,
+                c=duncan_prestige_type_education_intercept,
+                model_string='Prestige ~ Type + Education',
+                x1_label='Type \n{0 = prof, 1 = bc}',
+                x2_label='Education',
+                y_label = 'Prestige',
+               x1_1_or_0=True)
 ```
 
 ```{python}
