@@ -267,7 +267,7 @@ def plotly_3D_with_plane(dataset, x1_string, x2_string, y_string, hover_string_l
     x2 = scatter_3d.data[0].y
     x1, x2 = np.meshgrid(x1, x2)
     y = x1_slope * x1 + x2_slope * x2 + intercept
-    scatter_3d.add_trace(go.Surface(x=x1, y=x2, z=y, opacity=0.4))
+    scatter_3d.add_trace(go.Surface(x=x1, y=x2, z=y, opacity=0.2))
     
     # generate fitted values 
     predicted_values = intercept + x1_slope * scatter_3d.data[0].x + x2_slope * scatter_3d.data[0].y
@@ -1136,8 +1136,9 @@ We'll plot the regression line, and the data, for this model:
 
 ```{python}
 # do not worry about this code it just generates the plot
-def make_scatter(x, y, b, c, with_errors = True, show = False,
+def make_scatter_2(x, y, b, c, with_errors = True, show = False,
                  xlabel = 'Education',
+                 ylabel = 'Prestige',
                  x_0_1 = False,
                  rev_min_max = False,
                  show_fitted = True,
@@ -1161,7 +1162,7 @@ def make_scatter(x, y, b, c, with_errors = True, show = False,
         # a single legend entry for the dotted lines.
         plt.plot([], [], 'k:', label='Errors ($ \\varepsilon $)')
     plt.xlabel(xlabel)
-    plt.ylabel('Prestige')
+    plt.ylabel(ylabel)
     plt.title(f"\n$b$ = {round(b, round_to)} \n$c$ = {round(c,round_to)} \n Sum of Squared Error = {round(sum(errors**2), round_to)}")
     if x_0_1 == True:
         plt.xticks([0, 1])
@@ -1169,7 +1170,7 @@ def make_scatter(x, y, b, c, with_errors = True, show = False,
     plt.legend();
     if show == True:
         plt.show()
-make_scatter(education_2, prestige_2, duncan_prestige_education_2_slope, duncan_prestige_education_2_intercept)
+make_scatter_2(education_2, prestige_2, duncan_prestige_education_2_slope, duncan_prestige_education_2_intercept)
 ```
 
 ## Prestige ~ Type + Education
@@ -1213,7 +1214,7 @@ The rightmost graph shows the multi-predictor model `prestige ~ type + education
 
 ```{python}
 # do not worry about this code, it is just to generate the 3D plots
-def single_multi_comparison_subplots(x1 = type_dummy, x2 = education_2, y = prestige_2,
+def single_multi_comparison_subplots_2(x1 = type_dummy, x2 = education_2, y = prestige_2,
                                      x1_label = 'Type\n{0 = prof, 1 = bc}',
                                        x2_label = 'Education',
                                        y_label = 'Prestige',
@@ -1265,7 +1266,7 @@ def single_multi_comparison_subplots(x1 = type_dummy, x2 = education_2, y = pres
         ax.set_title(f"{model_strings[num]}\n$b_1$ = {round(x1_slope,round_to)} \n$b_2$ = {round(x2_slope,round_to)} \n$c$ = {round(c,round_to)} \n Sum of Squared Error = {round(sum_sq, round_to)}")
     plt.legend(loc = (1,  1))
     
-single_multi_comparison_subplots()
+single_multi_comparison_subplots_2()
 ```
 
 Once again, let's imagine these plots as physical objects, where you could stand on one of the axes, and look 
@@ -1278,7 +1279,7 @@ The person on the leftmost plot (dressed in blue) would see something like this 
 
 ```{python}
 # generate the plot
-make_scatter(education_2, prestige_2, duncan_prestige_education_2_slope, duncan_prestige_education_2_intercept)
+make_scatter_2(education_2, prestige_2, duncan_prestige_education_2_slope, duncan_prestige_education_2_intercept)
 ```
 
 Let's consider what the person on the middle plot (the ghostly figure dressed in black) would see:
@@ -1347,24 +1348,57 @@ interact(duncan_plotly_categorical)
 ## Statistical adjustment, with the EPL data, continuous predictors
 
 
-[EPL data, using 3D plots above]
+Just as a final illustration, to help you visualise what is happening in a case where statisticla adjustment *reverses* one of the slopes (e.g. changes it's +/- sign), we will return the English Premier League (EPL) data that we have seen previously.
+
+The data details wage spends in the 2021-2022 year for EPL football clubs. The observational units are football clubs, and the variables we are interested in are:
+
+`goal_difference` - the difference between the goals scored and goals conceded. This is a metric of performance (high, postivie values indicate better performance.
+
+`forward` - the club's wage spending on attacking players
+
+`defense` the club's wage spending on defensive players
+
+See [the EPL dataset
+page](https://github.com/odsti/datasets/tree/main/premier_league) for more
+details.
+
+Let's import the data:
 
 ```{python}
+# import the data
 epl = pd.read_csv('data/premier_league_2021.csv')
 epl.head()
 ```
 
+And let's pull out the variables of interest, and store them as python variables, to save us typing:
+
 ```{python}
+# store the `goal_difference` variable as an array
 goal_difference = epl['goal_difference'].values
 
+# store the `defense` variable as an array
 defense = epl['defense'].values
 
+# store the `forward` variable as an array
 forward = epl['forward'].values
 ```
 
+We wit fit the now familiar sequence:
+
+- two single-predictor models
+- one multi-predictor model, including both the predictors from the separate single-predictor models
+
+This will enable us to visualise the effects of statistical adjustment.
+
+
 ## Goal Difference ~ Forward
 
+First, we will fit the following single-predictor model:
+
+`goal_difference` = $b * $ `forward` + $ \text{c} + \vec{\varepsilon} $
+
 ```{python}
+# fir the `goal_difference ~ forward" model
 (epl_goaldiff_forward,
 epl_goaldiff_forward_intercept, 
 epl_goaldiff_forward_slope) = fit_model(model_spec_string='goal_difference ~ forward', 
@@ -1373,6 +1407,7 @@ epl_goaldiff_forward_slope) = fit_model(model_spec_string='goal_difference ~ for
 ```
 
 ```{python}
+# generate the plot
 def plot_goaldiff_forward(continuous_line=False):
     make_scatter(x=forward,
     y=goal_difference,
@@ -1388,9 +1423,17 @@ def plot_goaldiff_forward(continuous_line=False):
 plot_goaldiff_forward(continuous_line=True)
 ```
 
+We can see that, if we ignore `defense`, there is a positive linear relationship between `forward` and `goal_difference`.
+
+
 ## Goal Difference ~ Defense
 
+Now let's fit the following single-predictor model:
+
+`goal_difference` = $b * $ `defense` + $ \text{c} + \vec{\varepsilon} $
+
 ```{python}
+# fit the `goal_difference ~ defense` model
 (epl_goaldiff_defense,
 epl_goaldiff_defense_intercept, 
 epl_goaldiff_defense_slope) = fit_model(model_spec_string='goal_difference ~ defense', 
@@ -1399,6 +1442,7 @@ epl_goaldiff_defense_slope) = fit_model(model_spec_string='goal_difference ~ def
 ```
 
 ```{python}
+# generate the plot
 def plot_goaldiff_defense(continuous_line=False):
     make_scatter(x=defense,
     y=goal_difference,
@@ -1414,9 +1458,19 @@ def plot_goaldiff_defense(continuous_line=False):
 plot_goaldiff_defense(continuous_line=True)
 ```
 
+For this model, there is a positive linear association between `defense` and `goal_difference` (ignoring `forward`).
+
+
 ## Goal Difference ~ Forward + Defense
 
+First, we will fit the following single-predictor model:
+
+`goal_difference` = $b_1 * $ `forward` + $ + b_2 *$  `defense` + $ \text{c} + \vec{\varepsilon} $
+
+As we've seen previously, this now takes into account both predictors *at the same time* when fitting the model:
+
 ```{python}
+# fit the multi-predictor model
 (epl_goaldiff_forward_defense,
 epl_goaldiff_forward_defense_intercept, 
 epl_goaldiff_forward_defense_slope_forw,
@@ -1426,6 +1480,7 @@ epl_goaldiff_forward_defense_slope_def) = fit_model(model_spec_string='goal_diff
 ```
 
 ```{python}
+# plot the multi-predictor model
 make_3d_scatter(x1=forward,
                 x2=defense, 
                 y=goal_difference,
@@ -1441,7 +1496,12 @@ make_3d_scatter(x1=forward,
                 min_y=-100)
 ```
 
+We can see that the slope for `forward` is now *negative*, once we include `defense` in the model.
+
+Let's look at all the models, side-by-side, in 3D, so we can see how the regression plane has been adjusted in the multi-predictor model:
+
 ```{python}
+# generate the plot
 single_multi_comparison_subplots(x1=forward,
                                  x2=defense,
                                  y=goal_difference,
@@ -1459,6 +1519,12 @@ single_multi_comparison_subplots(x1=forward,
                                     cs = [epl_goaldiff_forward_intercept, epl_goaldiff_defense_intercept,
                                           epl_goaldiff_forward_defense_intercept])
 ```
+
+In the cell below, you'll once again find an interactive dropdown menu that lets you to select one of the three models shown on the plot above this cell. 
+
+**Pause for thought**: we *especially* encourage you to spend a lot of time interacting with this plot, with the same considerations as for the previous interactive plots.
+
+Switch between the models and try to develop an intution for how the distribution of the points causes the direction of the `forward` slope to reverse, in the multi-predictor model, relative to the single predictor model.
 
 ```{python}
 # generate the interactive plot
@@ -1502,4 +1568,8 @@ def epl_plotly(model = ["`goal_difference ~ foward` \n(ignoring `defense`)",
                         intercept=epl_goaldiff_forward_defense_intercept,
                         model_title_string=adjust)
 interact(epl_plotly)
+```
+
+```{python}
+
 ```
