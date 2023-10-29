@@ -253,7 +253,7 @@ def make_3d_scatter(x1, x2, y,
         return errors 
     
 def plotly_3D_with_plane(dataset, x1_string, x2_string, y_string, hover_string_list,
-                         x1_slope, x2_slope, intercept):
+                         x1_slope, x2_slope, intercept, model_title_string=''):
     """Interactive 3D scatter, via plotly."""
     # create the scattplot
     scatter_3d = px.scatter_3d(dataset, x=x1_string, y=x2_string, z=y_string,
@@ -278,6 +278,9 @@ def plotly_3D_with_plane(dataset, x1_string, x2_string, y_string, hover_string_l
                                           z = [scatter_3d.data[0].z[i], predicted_values[i]],
                                           mode='lines', showlegend=False,
                                           line={'color': 'black', 'dash':'dash'}))
+    # add a title to the plot
+    scatter_3d.update_layout(title=model_title_string)
+
     # show the plot
     scatter_3d.show()
 
@@ -905,8 +908,53 @@ Look at the difference between the regression planes of the first two plots (una
 single_multi_comparison_subplots()
 ```
 
-```{python}
+The cell below let's you use a drop down menu to select which model is fit to the data, you can then "move around" the plot, to get a better understainding of the concepts just outlined above.
 
+**Pause for thought:** we recommend spending some time with this interactive plot. Changing the model and exploring each graph. Refer to the "static" plots shown above, which depict the same models. 
+
+We also recommend adjusting the plot so it is as if you are "standing" on one of the axes, as was shown the figures above. If you select one of the single predictor models, then "stand" on the axis for the predictor in the model (e.g. if you select the `prestige ~ income` model, then "stand" on the `income` axis), what you will see is equivalent to the bivariate scatterplot for that model...:
+
+```{python}
+# generate the interactive plot
+def duncan_plotly(model = ["`prestige ~ education` \n(ignoring `income`)",
+                           "`prestige ~ income` \n(ignoring `education`)",
+                            "`prestige ~ education + income`"]):
+    ignore_income = "`prestige ~ education` \n(ignoring `income`)"
+    ignore_education = "`prestige ~ income` \n(ignoring `education`)"
+    adjust = "`prestige ~ education + income`"
+    if model == ignore_income:
+        plotly_3D_with_plane(dataset=duncan,
+                         x1_string='education',
+                         x2_string='income',
+                         y_string='prestige',
+                        hover_string_list=['name'],
+                        x1_slope=duncan_prestige_education_slope,
+                        x2_slope=0,
+                        intercept=duncan_prestige_education_intercept,
+                        model_title_string=ignore_income)
+    
+    elif model == ignore_education:
+        plotly_3D_with_plane(dataset=duncan,
+                         x1_string='education',
+                         x2_string='income',
+                         y_string='prestige',
+                        hover_string_list=['name'],
+                        x1_slope=0,
+                        x2_slope=duncan_prestige_income_slope,
+                        intercept=duncan_prestige_income_intercept,
+                        model_title_string=ignore_education)
+        
+    elif model == adjust:
+        plotly_3D_with_plane(dataset=duncan,
+                         x1_string='education',
+                         x2_string='income',
+                         y_string='prestige',
+                        hover_string_list=['name'],
+                        x1_slope=duncan_prestige_education_income_ed_slope,
+                        x2_slope=duncan_prestige_education_income_inc_slope,
+                        intercept=duncan_prestige_education_income_intercept,
+                        model_title_string=adjust)
+interact(duncan_plotly)
 ```
 
 <!-- #region -->
