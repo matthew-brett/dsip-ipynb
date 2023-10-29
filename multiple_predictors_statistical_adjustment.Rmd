@@ -990,9 +990,11 @@ However, statistical adjustment *can* also affect the direction of the slope, as
 First though, let's explore statistical adjustment in a multi-predictor linear regression model, where one of the predictors is a *categorical* variable.
 <!-- #endregion -->
 
-## Statistical adjustment, with the Duncan data, continuous and categorical predictors
+## Statistical adjustment, with continuous and categorical predictors
 
+To demonstrate how statistical adjustment works when we include a categorical predictor in a multi-predictor regression model, we'll use the Duncan data, but will restrict our analysis only to observational units that score either "blue collar" (`bc`) or "profession" (`prof`) on the `type` variable. This allows us to just use one dummy variable, which is simpler to visualise, but the princple extends to including additional categorical predictors.
 
+To code cell below selects rows of the `duncan` dataframe which are either `bc` or `prof`:
 
 ```{python}
 # restrict analysis to just `bc` and `prof` occupations
@@ -1002,6 +1004,14 @@ duncan_bc_prof = duncan[(duncan['type'] == 'bc') | (duncan['type'] == 'prof')].c
 duncan_bc_prof.head(20)
 ```
 
+Now, let's create a dummy variable for `type`, according to this procedure:
+
+$\text{For each observation, $i$, in the `type` vector:}$
+
+ `type_dummy` $ = \begin{cases} 1, & \text{if $i$ is `bc`} \\ 0, & \text{if $i$ is `prof`} \end{cases} $
+ 
+So, the dummy variable will equal 1 for `bc` occupations, and will equal 0 for `prof` occupations:
+
 ```{python}
 # create a dummy variable 
 duncan_bc_prof['type_dummy'] = duncan_bc_prof['type'].replace(['prof', 'bc'], [0, 1]).values
@@ -1010,9 +1020,17 @@ duncan_bc_prof['type_dummy'] = duncan_bc_prof['type'].replace(['prof', 'bc'], [0
 duncan_bc_prof.head(20)
 ```
 
+We now have less rows of data than for the full dataset (as we've dropped the "white collar" `wc` rows):
+
 ```{python}
 duncan_bc_prof['type'].value_counts()
 ```
+
+We're going to investigate the relationship between `prestige` (as our outcome variable) and `type_dummy` and `education` (as our predictors).
+
+As before, we'll first fit two separate single predictor linear regression models. We'll then fit a multi-predictor linear regression model, including both the predictors from the single predictor models. This will allow us to see the effects of statistical adjustment on the parameter estimates.
+
+Let's pull out our arrays from the `duncan_prof_bc` dataframe as normal (we'll pull out the `prestige` and `education` scores and store them as `prestige_2` and `education_2`, as there are now less values, after dropping the `wc` rows).
 
 ```{python}
 # store the type dummy as a variable
@@ -1040,13 +1058,22 @@ education_2
 
 ## Prestige ~ Type (ignoring Education)
 
+We'll first fit a single predictor linear regression of the following form:
+
+`prestige` = $b * $ `type_dummy` + $ \text{c} + \vec{\varepsilon} $
+
+As we know, this single predictor linear regression will *ignore* other potential predictors in the dataset. We'll use our fitting function again:
+
 ```{python}
+# fit the `prestige ~ type` model
 (duncan_prestige_type,
  duncan_prestige_type_intercept,
  duncan_prestige_type_slope)= fit_model(model_spec_string='prestige ~ type_dummy',
                                   dataset=duncan_bc_prof,
                                   slope_names_list=['type_dummy'])
 ```
+
+We'll plot the data, along with the regression line:
 
 ```{python}
 # do not worry about this code, it is just some convenience plotting functions
@@ -1091,13 +1118,21 @@ with_errors_categorical(duncan_prestige_type_slope, duncan_prestige_type_interce
 
 ## Prestige ~ Education (Ignoring Type)
 
+Now we'll fit a separate single-predictor linear regression model of the form:
+
+`prestige` = $b * $ `type_education` + $ \text{c} + \vec{\varepsilon} $
+
+
 ```{python}
+# fit the `prestige ~ education` model
 (duncan_prestige_education_2,
  duncan_prestige_education_2_intercept,
  duncan_prestige_education_2_slope)= fit_model(model_spec_string='prestige ~ education',
                                   dataset=duncan_bc_prof,
                                   slope_names_list=['education'])
 ```
+
+We'll plot the regression line, and the data, for this model:
 
 ```{python}
 # do not worry about this code it just generates the plot
@@ -1139,7 +1174,12 @@ make_scatter(education_2, prestige_2, duncan_prestige_education_2_slope, duncan_
 
 ## Prestige ~ Type + Education
 
+Now we'll include both predictors in the same model, so we can see the effects of statistical adjustment when a categorical predictor is involved:
+
+`prestige` = $b_1 * $ `type_dummy` + $b_2 * $ `education` $ \text{c} + \vec{\varepsilon} $
+
 ```{python}
+# fit the `prestige ~ type + education` model
 (duncan_prestige_type_education,
  duncan_prestige_type_education_intercept,
  duncan_prestige_type_education_type_slope,
@@ -1149,6 +1189,7 @@ duncan_prestige_type_education_ed_slope)= fit_model(model_spec_string='prestige 
 ```
 
 ```{python}
+# do not worry about this code, it just generates the plot
 make_3d_scatter(x1=type_dummy,
                 x2=education_2, 
                 y=prestige_2,
@@ -1161,6 +1202,14 @@ make_3d_scatter(x1=type_dummy,
                 y_label = 'Prestige',
                x1_1_or_0=True)
 ```
+
+The code cell below plots all these models on side-by-side graphs.
+
+The leftmost graph shows the `prestige ~ education` model (so the regression plane ignores the `type` variable).
+
+The middle graph shows the `prestige ~ type` model (so the regression plane ignores the `education` variable)
+
+The rightmost graph shows the multi-predictor model `prestige ~ type + education`, so we can see how the regression plane and parameter estimates are adjusted when we include both predictors:
 
 ```{python}
 # do not worry about this code, it is just to generate the 3D plots
@@ -1219,17 +1268,35 @@ def single_multi_comparison_subplots(x1 = type_dummy, x2 = education_2, y = pres
 single_multi_comparison_subplots()
 ```
 
+Once again, let's imagine these plots as physical objects, where you could stand on one of the axes, and look 
+at the plot:
+
 ![](images/stat_adjust_duncan_type_ed.png)
 
+
+The person on the leftmost plot (dressed in blue) would see something like this (again, pay attention to the parameter estimates and sum of squared error value, shown in the title of both plots):
+
 ```{python}
+# generate the plot
 make_scatter(education_2, prestige_2, duncan_prestige_education_2_slope, duncan_prestige_education_2_intercept)
 ```
 
+Let's consider what the person on the middle plot (the ghostly figure dressed in black) would see:
+
 ![](images/stat_adjust_duncan_type_ed.png)
 
+They would see something like this:
+
 ```{python}
+# generate the plot
 with_errors_categorical(duncan_prestige_type_slope, duncan_prestige_type_intercept)  
 ```
+
+The cell below has an interactive dropdown menu that allows you to select a model one of the three models we have just fit.The plot shows the regression plane for the model you've selected from the dropdown menu, and once again it displays errors as black dashed lines.
+
+**Pause for thought**: once again please take your time to interact carefully with this plot. Change the model selection and explore each graph. Please also refer to the three side-by-side static plots presented above, which represent the same models.
+
+We recommend adjusting the plot as if you are "positioned" on one of the axes, similar to the illustrations shown earlier. For example, if you choose one of the single predictor models, "position" yourself on the axis corresponding to the predictor in the model (e.g., if you select the `prestige ~ type` model, then "position" yourself on the `type` axis). What you will observe is equivalent to the bivariate scatterplot for that specific model, which are shown in the cells above this one:
 
 ```{python}
 # generate the interactive plot
