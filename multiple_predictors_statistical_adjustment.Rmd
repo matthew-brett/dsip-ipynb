@@ -710,10 +710,22 @@ The cell below shows the slopes for all the models fit so far (all the slopes ar
 
 ```{python}
 # do not worry about this code, it just generates the printout
+jupyprint('### Single Predictor Models')
 jupyprint(f"For the model `prestige ~ education`, the `education` slope = <b> {round(duncan_prestige_education_slope, 4)} </b>")
+jupyprint(f"For the model `prestige ~ income`, the `income` slope = <b> {round(duncan_prestige_income_slope, 4)} </b>")
+jupyprint('____________________________________\n### Multi-Predictor Model')
+jupyprint(f"For the model `prestige ~ education + income`, the `education` slope = <b> {round(duncan_prestige_education_income_ed_slope, 4)} </b>")
+jupyprint(f"For the model `prestige ~ education + income`, the `income` slope = <b> {round(duncan_prestige_education_income_inc_slope, 4)} </b>")
 ```
 
+The slopes from the single predictor models are different from the slopes in the multi-predictor model because the fitting process has now *adjusted* each slope in light of the other predictor variable.
+
+But what does this mean? It is easiest to understand graphically.
+
+Let's plot the regression plane for the `prestige ~ education + income` model:
+
 ```{python}
+# do not worry about this code, it just generates the 3D scatterplot
 make_3d_scatter(education,
                 income, 
                 prestige,
@@ -726,6 +738,16 @@ make_3d_scatter(education,
                 model_string='Prestige ~ Education + Income')
 ```
 
+Now, remember earlier we saw that we can display the single-predictor linear regression in 3D, by taking the parameter estimates (the slope and the intercept) from the single-predictor regression, and setting the slope of the other predictor to 0?
+
+The cell below will generate three 3D plots.
+
+The first (leftmost) plot will show the `prestige ~ education` model, in 3D (where the regression plane is generated only from the parameter estimates of the `prestige ~ education` model).
+
+The middle plot will show the `prestige ~ income` model, in 3D (where the regression plane is generated only from the parameter estimates of the `prestige ~ income` model).
+
+The last (rightmost) plot will show the `prestige ~ education + income` model, in 3D (where the regression plane is generated using the parameter estimates from the multi-predictor model):
+
 ```{python}
 # do not worry about this code, it is just to generate the 3D plots
 def single_multi_comparison_subplots(x1 = education, x2 = income, y = prestige,
@@ -735,7 +757,7 @@ def single_multi_comparison_subplots(x1 = education, x2 = income, y = prestige,
                                        plane_alpha = 0.5,
                                        x1_0_and_1 = False,
                                        x2_0_and_1 = False,
-                                       round_to = 2,
+                                       round_to = 4,
                                         model_strings = ["`prestige ~ education` \n(ignoring `income`)",
                                                          "`prestige ~ income` \n(ignoring `education`)",
                                                          "`prestige ~ education + income`"],
@@ -743,12 +765,14 @@ def single_multi_comparison_subplots(x1 = education, x2 = income, y = prestige,
                                     x2_slopes=[0, duncan_prestige_income_slope, duncan_prestige_education_income_inc_slope],
                                     cs = [duncan_prestige_education_intercept, duncan_prestige_income_intercept,
                                           duncan_prestige_education_income_intercept]):
+    # set up the plot object
     fig, axes = plt.subplots(1, 3, figsize=(16, 10), subplot_kw={'projection': '3d'})
-   
+    # iterate over the subplot locations, slope lists and intercept list
     for num, (subplot_val, x1_slope, x2_slope, c) in enumerate(zip([131, 132, 133],
                                                                x1_slopes,
                                                                x2_slopes,
                                                                cs)):
+        # generate the subplot
         sum_sq = ss_two_predictors([x1_slope, x2_slope, c], x1, x2, y)
         ax = axes[num]
         ax.scatter(x1,x2,y, label = 'Actual values ($y$)')
@@ -765,13 +789,13 @@ def single_multi_comparison_subplots(x1 = education, x2 = income, y = prestige,
         min_x1 = np.min([0, x1.min()])
         min_x2 = np.min([0, x2.min()])
         min_y = np.min([0, y.min()])
-        # Plot the fitting plane.
+        # plot the fitting plane.
         plane_x = np.linspace(min_x1, mx_x1, 50)
         plane_y = np.linspace(min_x2, mx_x2, 50)
         X, Y = np.meshgrid(plane_x, plane_y)
         Z = c + x1_slope * X + x2_slope * Y
         ax.plot_wireframe(X,Y,Z, color = 'red', label = 'Linear regression plane', alpha = plane_alpha)
-        # Plot lines between each point and fitting plane
+        # plot lines between each point and fitting plane
         for i in np.arange(len(y)):
             x1_point, x2_point, actual = x1[i], x2[i], y[i]
             fitted = c + x1_point * x1_slope + x2_point * x2_slope
@@ -785,7 +809,7 @@ def single_multi_comparison_subplots(x1 = education, x2 = income, y = prestige,
             linewidth=0.5,
             color='black',
             label = 'Errors ($ \\varepsilon $)')
-        # Set the axis limits (and reverse y axis)
+        # set the axis limits
         ax.set_xlim(min_x1, mx_x1)
         ax.set_ylim(min_x2, mx_x2)
         ax.set_zlim(min_y, mx_y)
@@ -795,26 +819,51 @@ def single_multi_comparison_subplots(x1 = education, x2 = income, y = prestige,
 single_multi_comparison_subplots()
 ```
 
-[Imagine this as a physical object]
+Now, once again, let's imagine these plot as physical objects, where you could stand on one axis and look at one of the "walls" of the plot.
+
+The image below shows two people (one of whom we met earlier) standing on the different axes of the plot:
 
 ![](images/stat_adjust_duncan_ed_inc.png)
+
+Let's "zoom" in on the leftmost graph, and think what the person standing on the `education` axis would see:
 
 
 ![](images/stat_adjust_duncan_ed.png)
 
+
+As mentioned above, assuming the person was standing in the right location, they would see something like (compare the slope, intercept and sum of the squared error values above both of the graphs also):
+
 ```{python}
+# generate what the person on the `education` axis would see
 plot_prestige_education(continuous_line=True)
 ```
 
+Now, let's "zoom in" on the middle graph, and think what the person standing on the `income` axis would see:
+
+
 ![](images/stat_adjust_duncan_inc.png)
 
+
+They would see something like this (once again, compare the slope, intercept and sum of the squared error values above both of the graphs also):
+
 ```{python}
+# show what the person standing on the `income` axis would see
 plot_prestige_income(continuous_line=True)
 ```
 
+The first two plots show us the *unadjusted* estimates of the linear relationship between each predictor and the outcome variable.
+
+The reason that the "view from one of the axes" for the first two graphs is *identical* to the 2D scatterplot, is that the single-predictor model **ignores information from the other predictor**. So the regression line (or plane, in 3D) is fit only **with reference to the distance from the points along one axis**.
+
+Look at the difference between the regression planes of the first two plots (unadjusted estimates, ignoring the other predictor) and the regression plane on the third plot (**adjusted** estimates, taking into account the other predictor):
+
 ```{python}
+# generate the plot
 single_multi_comparison_subplots()
 ```
+
+This is the process of statistical adjustment.
+
 
 ## Statistical adjustment, with the EPL data, continuous predictors
 
