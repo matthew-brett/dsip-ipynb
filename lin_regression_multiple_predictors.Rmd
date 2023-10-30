@@ -8,7 +8,7 @@ jupyter:
       extension: .Rmd
       format_name: rmarkdown
       format_version: '1.2'
-      jupytext_version: 1.14.5
+      jupytext_version: 1.14.6
   kernelspec:
     display_name: Python 3 (ipykernel)
     language: python
@@ -1145,6 +1145,7 @@ def make_3d_scatter(x1, x2, y,
     ax.set_xlim(0, mx_x1)
     ax.set_ylim(0, mx_x2)
     ax.set_zlim(0, mx_y)
+    ax.zaxis.labelpad=-3
     # show the legend
     plt.legend()
     plt.title(f"\n$b_1$ = {round(x1_slope,2)} \n$b_2$ = {round(x2_slope,2)} \n$c$ = {round(c,2)} \n Sum of Squared Error = {round(sum_sq, 2)}")
