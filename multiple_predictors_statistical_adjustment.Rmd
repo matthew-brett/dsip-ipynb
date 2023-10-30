@@ -420,7 +420,9 @@ def fit_single_pred_model(model_spec_string,
 
     # return the model object, the intercept and the slope
     return model, intercept, slope
+```
 
+```{python}
 # test the function, with the model we just fitted (`prestige ~ education`)
 test_model, test_intercept, test_slope = fit_single_pred_model(
     'prestige ~ education',
@@ -1373,7 +1375,7 @@ Just as a final illustration, to help you visualise what is happening in a case 
 
 The data details wage spends in the 2021-2022 year for EPL football clubs. The observational units are football clubs, and the variables we are interested in are:
 
-`goal_difference` - the difference between the goals scored and goals conceded. This is a metric of performance (high, postivie values indicate better performance.
+`goal_difference` - the difference between the goals scored and goals conceded. This is a metric of performance (high, positive values indicate better performance.
 
 `forward` - the club's wage spending on attacking players
 
