@@ -1323,6 +1323,10 @@ make_scatter(type_dummy, prestige,
              rev_min_max=True)
 ```
 
+```{python}
+
+```
+
 The graph below shows the three regressions on separate graphs.
 
 The single predictor regressions are also shown on 3D scatterplots **but the slope of the plane only takes into account information from one predictor variable**. E.g. the slope of the other predictor is set to 0 (which is the same as not including it in the model).

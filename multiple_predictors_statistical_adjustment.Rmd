@@ -422,7 +422,10 @@ def fit_single_pred_model(model_spec_string,
     return model, intercept, slope
 
 # test the function, with the model we just fitted (`prestige ~ education`)
-test_model, test_intercept, test_slope = fit_single_pred_model('prestige ~ education',
+test_model, test_intercept, test_slope = fit_single_pred_model(
+    'prestige ~ education',
+    duncan,
+    education)
 ```
 
 To "sanity check" our function, the two cells below test the intercept/slope
