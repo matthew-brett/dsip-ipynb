@@ -1200,6 +1200,8 @@ def make_3d_scatter(x1, x2, y,
         linewidth=0.5,
         color='black',
         label='Errors ($ \\varepsilon $)')
+    # Show intercept
+    ax.plot(0, 0, c, 'ro', label='Intercept')
     # Set the axis limits (and reverse y axis)
     ax.set_xlim(0, mx_x1)
     ax.set_ylim(0, mx_x2)
