@@ -822,8 +822,10 @@ The last (rightmost) plot will show the `prestige ~ education + income` model, i
 ```{python}
 # do not worry about this code, it is just to generate the 3D plots
 def single_multi_comparison_subplots(
-    x1 = education, x2 = income, y = prestige,
-    x2_label='Education',
+    x1=education,
+    x2=income,
+    y=prestige,
+    x1_label = 'Education',
     x2_label='Income',
     y_label='Prestige',
     plane_alpha=0.5,
