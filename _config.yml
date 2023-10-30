@@ -48,7 +48,10 @@ launch_buttons:
   thebe: true
 
 sphinx:
+  recursive_update: true
   config:
+    html_theme_options:
+      navigation_with_keys: false
     nb_custom_formats:
       .Rmd:
         - jupytext.reads
