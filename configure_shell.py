@@ -54,7 +54,7 @@ def get_posix_configfile():
 def set_windows_path(site_path):
     res = check_output(f'setx PATH "%PATH%;{site_path}',
                        shell=True,
-                       text=True).split()
+                       text=True).strip()
     if not res.startswith('SUCCESS:'):
         raise RuntimeError(f'SETX failed: {res}')
 
