@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-""" Write (or echo) configuration for user installs
+""" Write configuration to put user install script on PATH
 """
 
 import os
 import sys
 import sysconfig
-import tempfile
 import re
 from subprocess import check_output
 from pathlib import Path
@@ -44,7 +43,7 @@ def get_unix_shell():
 
 
 def get_posix_configfile():
-    is_mac = os.name == 'darwin'
+    is_mac = sys.platform == 'darwin'
     shell = get_mac_shell() if is_mac else get_unix_shell()
     if shell == 'bash':
         return USER_PATH / ('.bash_profile' if is_mac else '.bashrc')
@@ -54,7 +53,7 @@ def get_posix_configfile():
         raise RuntimeError(f'Unexpected shell {shell}')
 
 
-def set_windows_path(site_path):
+def set_windows_path_env(site_path):
     ps_exe = getout('where powershell')
     var_type = '[System.EnvironmentVariableTarget]::User'
     user_path = getout(
@@ -67,8 +66,8 @@ def set_windows_path(site_path):
 
 
 def set_path_config(site_path):
-    if os.name == 'nt':
-        set_windows_path(site_path)
+    if sys.platform == 'win32':
+        set_windows_path_env(site_path)
         return
     sp_rel = site_path.relative_to(USER_PATH)
     out_text = f'''
@@ -78,7 +77,9 @@ export PATH="$PATH:${{HOME}}/{sp_rel}"
 '''
     config_path = get_posix_configfile()
     config_text = config_path.read_text()
-    if not out_text in config_text:
+    if out_text in config_text:
+        print(f'Configuration already exists in {config_path}')
+    else:
         config_path.write_text(f'{config_text}\n{out_text}')
 
 
@@ -87,12 +88,12 @@ def main():
     args = parser.parse_args()
     site_path_str = sysconfig.get_path("scripts",f"{os.name}_user")
     site_path = Path(site_path_str).resolve()
-    if not args.allow_existing and site_path in get_paths():
-        print(f'{site_path} already appears to be on your PATH')
+    if (not args.allow_existing) and (site_path in get_paths()):
+        sys.stderr.write(f'{site_path} already appears to be on your PATH')
         sys.exit(1)
     set_path_config(site_path)
     print("""\
-Now close all terminals and start a new terminal to load new config""")
+Now close all terminals and start a new terminal to load new configuration.""")
 
 
 if __name__ == '__main__':
