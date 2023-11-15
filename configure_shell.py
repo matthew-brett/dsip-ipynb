@@ -53,24 +53,17 @@ def get_posix_configfile():
     else:
         raise RuntimeError(f'Unexpected shell {shell}')
 
-ps_script_fmt = """\
-# Set given path onto user path
-$user_path=[Environment]::GetEnvironmentVariable("PATH", "User")
-[Environment]::SetEnvironmentVariable("PATH", "$user_path;{site_path}", [System.EnvironmentVariableTarget]::User)
-"""
-
 
 def set_windows_path(site_path):
-    powershell_exe = getout('where powershell')
-    try:
-        fd, fname = tempfile.mkstemp(suffix='.ps1')
-        os.close(fd)
-        script_path = Path(fname)
-        script_path.write_text(ps_script_fmt.format(site_path=site_path))
-        res = getout(f'"{powershell_exe}" -file "{script_path}"')
-        print('res', res)
-    finally:
-        os.unlink(fname)
+    ps_exe = getout('where powershell')
+    var_type = '[System.EnvironmentVariableTarget]::User'
+    user_path = getout(
+        [ps_exe, '-command',
+         f'[Environment]::GetEnvironmentVariable("PATH", {var_type})'])
+    getout(
+        [ps_exe, '-command',
+        '[Environment]::SetEnvironmentVariable("PATH",'
+         f'"{user_path};{site_path}", {var_type})'])
 
 
 def set_path_config(site_path):
