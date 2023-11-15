@@ -152,6 +152,8 @@ stored.  You can do this from your Powershell terminal.
 # Find the directory with the new commands.
 $site_path=python3 -c 'import os,sysconfig;print(sysconfig.get_path("scripts",f"{os.name}_user"))'
 echo $site_path
+$user_path=[Environment]::GetEnvironmentVariable("PATH", "User")
+[Environment]::SetEnvironmentVariable("PATH", "$user_path;$site_path", [System.EnvironmentVariableTarget]::User)
 ```
 
 You should add this directory to the list of directories that Windows

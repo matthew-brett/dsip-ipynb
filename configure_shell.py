@@ -5,6 +5,7 @@
 import os
 import sys
 import sysconfig
+import tempfile
 import re
 from subprocess import check_output
 from pathlib import Path
@@ -21,6 +22,9 @@ def get_parser():
     return parser
 
 
+def getout(s):
+    return check_output(s, shell=True, text=True).strip()
+
 
 def get_paths():
     path = os.path.os.environ['PATH']
@@ -28,8 +32,7 @@ def get_paths():
 
 
 def get_mac_shell():
-    shell_info = check_output('dscl . -read ~/ UserShell',
-                              shell=True, text=True).strip()
+    shell_info = getout('dscl . -read ~/ UserShell')
     return re.match(r'UserShell: (/\w+)+', shell_info).groups()[-1][1:]
 
 
@@ -50,13 +53,24 @@ def get_posix_configfile():
     else:
         raise RuntimeError(f'Unexpected shell {shell}')
 
+ps_script_fmt = """\
+# Set given path onto user path
+$user_path=[Environment]::GetEnvironmentVariable("PATH", "User")
+[Environment]::SetEnvironmentVariable("PATH", "$user_path;{site_path}", [System.EnvironmentVariableTarget]::User)
+"""
+
 
 def set_windows_path(site_path):
-    res = check_output(f'setx PATH "%PATH%;{site_path}',
-                       shell=True,
-                       text=True).strip()
-    if not res.startswith('SUCCESS:'):
-        raise RuntimeError(f'SETX failed: {res}')
+    powershell_exe = getout('where powershell')
+    try:
+        fd, fname = tempfile.mkstemp(suffix='.ps1')
+        os.close(fd)
+        script_path = Path(fname)
+        script_path.write_text(ps_script_fmt.format(site_path=site_path))
+        res = getout(f'"{powershell_exe}" -file "{script_path}"')
+        print('res', res)
+    finally:
+        os.unlink(fname)
 
 
 def set_path_config(site_path):
@@ -67,7 +81,7 @@ def set_path_config(site_path):
     out_text = f'''
 # Inserted by configure_shell
 # Add Python --user script directory to PATH
-export PATH="$PATH:${{HOME}}/{str(sp_rel)}"
+export PATH="$PATH:${{HOME}}/{sp_rel}"
 '''
     config_path = get_posix_configfile()
     config_text = config_path.read_text()
