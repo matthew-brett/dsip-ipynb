@@ -74,7 +74,7 @@ the label "good" for patients with good appetite, and "poor" for those with
 poor appetite.  Poor appetite is a [symptom of chronic kidney
 disease](https://www.sciencedirect.com/science/article/abs/pii/S0270929508001666).  In our case, we wonder whether the extent of kidney damage does a convincing job in predicting whether the patient has a "good" appetite.
 
-As you remember, the CKD dataset has a column "Hemoglobin" that has the
+The CKD dataset has a column "Hemoglobin" that has the
 concentration of hemoglobin from a blood sample.  Hemoglobin is the molecule
 that carries oxygen in the blood; it is the molecule that makes the red blood
 cells red.  Damaged kidneys produce lower concentrations of the hormone that
@@ -404,9 +404,7 @@ than a simple, unconstrained straight line for our predictions.
 ## Another prediction line
 
 Here's another prediction line we might use for `appetite_d`, with the
-predicted values.
-
-For the moment, let's not worry about how we came by this line, we will come
+predicted values. For the moment, let's not worry about how we came by this line, we will come
 onto that soon. (If it wasn't obvious, this is the sort of prediction line we get from 
 logistic regression)! 
 
@@ -674,14 +672,15 @@ odds = p / (1 - p)
 odds
 ```
 
-Notice the odds is less than one, because the probability of an event of interest (`p`) was less than 0.5.   
+Notice the odds is less than one, because the probability of an event of interest (`p`) was less than 0.5.  
 
-**Odds of less than one means that the probability of an event of interest was less
-than 0.5, and the event of interest is less likely to happen than the
-alternative**.  
+**Odds of 1 indicate that the event of interest is equally as likely as events not of interest.**
+
+**Odds of less than one means that the event of interest is less likely to happen than
+events not of interest.**.  
 
 **Odds of greater than one means the event of interest is more likely to
-happen than the alternative.**
+happen than events not of interest.**
 
 If the probability of an event of interest is 0, then the odds are 0.
 
