@@ -1017,7 +1017,7 @@ sigmoid_score
 
 ```{python}
 plot_hgb_app()
-plt.scatter(hemoglobin, sigmoid_predictions, color = 'gold')
+plt.scatter(hemoglobin, sigmoid_predictions, color = 'gold', label = 'predictions from logit via sum of squares')
 for i in np.arange(len(hemoglobin)):
     plt.plot([hemoglobin[i], hemoglobin[i]], [sigmoid_predictions[i], appetite_d[i]], 'k:')
 # the following code line is just to trick Matplotlib into making a new
@@ -1102,6 +1102,12 @@ plot_hgb_app()
 plt.scatter(hemoglobin, logit_ss_predicted_prob_of_1,
             label='Logistic regression curve \n(from sum of squared error on log odds scale)',
             color='gold')
+for i in np.arange(len(hemoglobin)):
+    plt.plot([hemoglobin[i], hemoglobin[i]], [logit_ss_predicted_prob_of_1[i], appetite_d[i]], 'k:')
+    # the following code line is just to trick Matplotlib into making a new
+    # a single legend entry for the dotted lines.
+plt.plot([], [], 'k:', label='Errors ($ \\varepsilon $)')
+    
 # Show the legend.
 plt.legend(loc=(1.1, 0.5));
 ```
