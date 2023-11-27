@@ -11,9 +11,9 @@ Your task (as a group) is to fit the following logistic regression model `Class 
 
 To do this you should write the following set of scripts (**as much as possible, you should each work on separate parts of the analysis, and collaborate via pull requests**):
 
-- COST FUNCTION SCRIPT: create a .py file containing the logit transformation function, the inverse logit transformation function, and the logistic regression cost function. DO NOT COPY/PASTE the functions from the textbook page, try to re-write them line-by-line yourselves so you understand what each line is doing. These can imported by other scripts in the repository, e.g. if this file is called "cost_function_utils.py" then you can import the function into other scripts using `import cost_function_utils`
+- DATA CLEANING SCRIPT: a .py file to perform you data cleaning (e.g. creating the dummy codes for `Class`). Use `df.to_csv()` to save your clean data to a csv file with a different filename to the original file name.
 
-- DATA CLEANING SCRIPT: a .py file to perform you data cleaning (e.g. creating the dummy codes for `Class`). Use `df.to_csv()` to save your clean data to a csv file with a different filename.
+- COST FUNCTION SCRIPT: create a .py file containing the logit transformation function, the inverse logit transformation function, and the logistic regression cost function. DO NOT COPY/PASTE the functions from the textbook page, try to re-write them line-by-line yourselves so you understand what each line is doing. These functions can then can imported by other scripts in the repository, e.g. if this file is called "cost_function_utils.py" then you can import the function into other scripts using `import cost_function_utils`
 
 - DATA ANALYSIS SCRIPT: this .py file should do several things:
         - First, this script should plot `Class` as a function of `Hemoglobin`. 
