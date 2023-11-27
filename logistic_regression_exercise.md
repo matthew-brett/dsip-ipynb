@@ -11,12 +11,12 @@ Your task (as a group) is to fit the following logistic regression model `Class 
 
 To do this you should write the following set of scripts (**as much as possible, you should each work on separate parts of the analysis, and collaborate via pull requests**):
 
-    - COST FUNCTION SCRIPT: create a .py file containing the logistic regression cost function (DO NOT COPY it from the page) try to re-write it yourselves so you understand what each line is doing. This can imported by other scripts in the repository, e.g. if this file is called "my_cost_function.py" then you can import the function into other scripts using `import my_cost_function`
+- COST FUNCTION SCRIPT: create a .py file containing the logistic regression cost function (DO NOT COPY it from the page) try to re-write it yourselves so you understand what each line is doing. This can imported by other scripts in the repository, e.g. if this file is called "my_cost_function.py" then you can import the function into other scripts using `import my_cost_function`
 
-    - DATA CLEANING SCRIPT: a .py file to perform you data cleaning (e.g. creating the dummy codes for `Class`). Use `df.to_csv()` to save your clean data to 
+- DATA CLEANING SCRIPT: a .py file to perform you data cleaning (e.g. creating the dummy codes for `Class`). Use `df.to_csv()` to save your clean data to 
     a csv file with a different filename.
 
-    - DATA ANALYSIS SCRIPT: this .py file should do several things:
+- DATA ANALYSIS SCRIPT: this .py file should do several things:
         - First, this script should plot `Class` as a function of `Hemoglobin`. 
         - Then the script should fit your model (`Class ~ Hemoglobin`) using `minimize` (by importing your cost function from COST FUNCTION SCRIPT). 
         - You should then fit the same model using statsmodels.
