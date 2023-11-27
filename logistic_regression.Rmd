@@ -1211,12 +1211,13 @@ for i in np.arange(len(hgb_predicted)):
 
     # if the current observational unit (patient) had an `appetite_d` score of 1...
     if hgb_predicted['appetite_dummy'].iloc[i] == 1:
+        
         # ...then record the predicted probability of 1 as the predicted probability of its actual score
         predicted_prob_of_actual_score[i] = hgb_predicted['predicted_prob_of_1'].iloc[i]
 
     # if the current observational unit (patient) had an `appetite_d` score of 0...
     if hgb_predicted['appetite_dummy'].iloc[i] == 0:
-
+        
         # ...then record 1 MINUS the predicted probability of 1 as the predicted probability of its actual score
         predicted_prob_of_actual_score[i] = 1 - hgb_predicted['predicted_prob_of_1'].iloc[i]
         
@@ -1226,11 +1227,15 @@ hgb_predicted
 ```
 
 There's a fancy short-cut to the several lines above, that relies on the fact
-that multiplying by 0 gives 0.  We can form the `predicted_prob_of_actual_score` column by first
+that multiplying by 0 gives 0.  
+
+We can form the `predicted_prob_of_actual_score` column by first
 multiplying the 0 or 1 label column values by the values in `predicted_prob_of_1`.  This
 correctly sets the `predicted_prob_of_actual_score` values for labels of 1, and leaves the
-remainder as 0. Then we reverse the 0 / 1 labels by subtracting from 1, and
-multiply by `pp_of_0` to set the 0 values to their correct values.  Adding
+remainder as 0. 
+
+Then we reverse the 0 and 1 labels by subtracting from 1, and
+multiply by `1 - predicted_prob_of_1` to set the 0 values to their correct values.  Adding
 these two results gives us the correct set of values for both 1 and 0 labels.
 
 ```{python}
@@ -1269,15 +1274,15 @@ hgb_predicted['predicted_prob_of_actual_score_again'] = final_again
 hgb_predicted
 ```
 
-When the `pp_of_actual_label` values are near 1, this means the result was close to
+When the `predicted_prob_of_actual_score` values are near 1, this means the result was close to
 the prediction.  When they are near 0, it means the result was unlike the
 prediction.
 
 Now we know the probabilities of each actual 0 and 1 label, we can get a
 measure of how *likely* the *combination* of all these labels are, given these
 predictions. We do this by *multiplying* all the probabilities in
-`pp_of_actual_label`.  When the probabilities in `pp_of_actual_label` are all fairly near 1,
-multiplying them will give a number that is not very small.  When some or many
+`predicted_prob_of_actual_score`.  When the probabilities in `predicted_prob_of_actual_score`
+are all fairly near 1, multiplying them will give a number that is not very small.  When some or many
 of the probabilities are close to 0, the multiplication will generate a very
 small number.
 
@@ -1298,7 +1303,7 @@ likelihood
 
 This is a very small number.  Likelihoods are often close to 0 with a
 reasonable number of points, and somewhat inexact prediction, because there
-tend to be a reasonable number of small p values in `pp_of_actual_labels`.  The
+tend to be a reasonable number of small p values in `predicted_prob_of_actual_score`.  The
 question is - do other values for the intercept and slope give smaller or
 larger values for the likelihood?
 
@@ -1610,7 +1615,7 @@ these questions.
 
   Reflect, using the reasoning here, then try it and see.
 
-* Consider the expression `np.sum(np.log(pp_of_actual_labels))` in the
+* Consider the expression `np.sum(np.log(predicted_prob_of_actual_score)` in the
   `mll_logit_cost` cost function.  This is using `np.log`, which is log to the
   base `np.e`.  Consider what would happen if you change this expression to
   `np.sum(np.log10(pp_of_actual_labels))` (log to the base 10).  What would happen to:
