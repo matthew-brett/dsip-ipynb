@@ -641,7 +641,7 @@ We can think of this same information as an *odds*.
 We often express probabilities as odds. To break this down, for clarity let's think of a scenario with
 some nice, clean probabilities.
 
-Imagine there are 100 people standing in a room. 80 of them are civil servants. If we picked a person at random, the probability they
+Imagine there are 100 people standing in a room. 20 of them are civil servants. If we picked a person at random, the probability they
 will be a civil servant is 20/100. By contrast, the odds is the number of times we expect to see the event of interest
 (e.g. being a civil servant) for every time we expect to see the event of no interest (not
 being a civil servant):
@@ -823,7 +823,7 @@ fig, axes = plt.subplots(1, 2)
 ax0, ax1 = axes
 ax0.scatter(hemoglobin, predictions_or, color='gold')
 ax0.plot(fine_x, fine_y_or, linewidth=1, linestyle=':')
-ax0.set_title('odds')
+ax0.set_title('Odds')
 ax0.set_xlabel('Hemoglobin')
 ax0.set_ylabel('odds');
 ax1.scatter(hemoglobin, predictions_or_log, color='gold')
@@ -1019,8 +1019,14 @@ sigmoid_score
 ```{python}
 plot_hgb_app()
 plt.scatter(hemoglobin, sigmoid_predictions, color = 'gold')
+for i in np.arange(len(hemoglobin)):
+    plt.plot([hemoglobin[i], hemoglobin[i]], [sigmoid_predictions[i], appetite_d[i]], 'k:')
+# the following code line is just to trick Matplotlib into making a new
+# a single legend entry for the dotted lines.
+plt.plot([], [], 'k:', label='Errors ($ \\varepsilon $)')
 plt.xlabel('Hemoglobin')
 plt.ylabel('Sigmoid (p-value) predictions')
+plt.legend(loc=(1.1, 0.5));
 ```
 
 Next we make the cost function that minimize will use.  It must accept an array
@@ -1245,7 +1251,7 @@ final
 
 ```{python}
 # This gives the same result as the code cell above:
-hgb_predicted['pp_of_actual_score_fancy'] = final
+hgb_predicted['predicted_prob_of_actual_score_fancy'] = final
 hgb_predicted
 ```
 
@@ -1254,7 +1260,7 @@ We can do the whole cell above in one line:
 ```{python}
 # Compact version of pp of label calculation.
 final_again = appetite_d * predicted_prob_of_1 + (1 - appetite_d) * (1 - predicted_prob_of_1)
-hgb_predicted['pp_again'] = final_again
+hgb_predicted['predicted_prob_of_actual_score_again'] = final_again
 hgb_predicted
 ```
 
@@ -1281,7 +1287,7 @@ Here is the likelihood for our intercept of -7 and slope of 0.8.
 
 ```{python}
 # np.prod multiplies each number to give the product of all the numbers.
-likelihood = np.prod(pp_of_actual_label)
+likelihood = np.prod(hgb_predicted['predicted_prob_of_actual_score'])
 likelihood
 ```
 
@@ -1307,12 +1313,16 @@ def simple_ml_logit_cost(intercept_and_slope, x, y):
     """
     intercept, slope = intercept_and_slope
     
-    # Make predictions for sigmoid.
+    # Make predictions on the log odds (straight line) scale
     predicted_log_odds = intercept + slope * x
+
+    # Convert these predictions to probabilities.
     predicted_prob_of_1 = inverse_logit(predicted_log_odds)
     
-    # Calculate predicted probabilities of actual labels.
+    # Calculate predicted probabilities of the actual scores.
     predicted_prob_of_actual_scores = y * predicted_prob_of_1 + (1 - y) * (1 - predicted_prob_of_1)
+
+    # Multiply the predicted probabiity of the actual score
     likelihood = np.prod(predicted_prob_of_actual_scores)
     
     # Ask minimize to find maximum by adding minus sign.
@@ -1332,12 +1342,12 @@ differences by passing a very small value to the `tol` parameter (`tol` for
 *tolerance*).
 
 ```{python}
-logistic_reg_1 = minimize(simple_ml_logit_cost,  # Cost function
+logistic_reg_ML = minimize(simple_ml_logit_cost,  # Cost function
                  [-7, 0.8],  # Guessed intercept and slope
                  args=(hemoglobin, appetite_d),  # x and y values
                  tol=1e-16)  # Attend to tiny changes in cost function values.
 # Show the result.
-logistic_reg_1
+logistic_reg_ML
 ```
 
 `minimize` complains that it was not happy with the numerical accuracy of its
@@ -1345,13 +1355,13 @@ answer, and we will address that soon.  For now, let us look at the predictions
 to see if they are reasonable.
 
 ```{python}
-inter_logistic_reg_1, slope_logistic_reg_1 = logistic_reg_1.x
-predicted_logistic_reg_1 = inverse_logit(inter_logistic_reg_1 + slope_logistic_reg_1 * hemoglobin)
+inter_logistic_reg_ML, slope_logistic_reg_ML = logistic_reg_ML.x
+predicted_logistic_reg_ML = inverse_logit(inter_logistic_reg_ML + slope_logistic_reg_ML * hemoglobin)
 ```
 
 ```{python tags=c("remove-input")}
 plot_hgb_app()
-plt.scatter(hemoglobin, predicted_logistic_reg_1, c='gold', label='logistic_reg_1 prediction')
+plt.scatter(hemoglobin, predicted_logistic_reg_ML, c='gold', label='logistic_reg_1 prediction')
 plt.legend();
 ```
 
@@ -1463,13 +1473,19 @@ def mll_logit_cost(intercept_and_slope, x, y):
     Return minus of the log of the likelihood.
     """
     intercept, slope = intercept_and_slope
-    # Make predictions for sigmoid.
+    
+    # Make predictions for on the log odds (straight line) scale.
     predicted_log_odds = intercept + slope * x
+
+    # convert these predictions to sigmoid probability predictions
     predicted_prob_of_1 = inverse_logit(predicted_log_odds)
-    # Calculate predicted probabilities of actual labels.
+
+    # Calculate predicted probabilities of the actual score, for each observation.
     predicted_probability_of_actual_score = y * predicted_prob_of_1 + (1 - y) * (1 - predicted_prob_of_1)
+    
     # Use logs to calculate log of the likelihood
     log_likelihood = np.sum(np.log(predicted_probability_of_actual_score))
+    
     # Ask minimize to find maximum by adding minus sign.
     return -log_likelihood
 ```
@@ -1477,12 +1493,12 @@ def mll_logit_cost(intercept_and_slope, x, y):
 Use the new cost function:
 
 ```{python}
-logistic_reg_2 = minimize(mll_logit_cost,  # Cost function
+logistic_reg_MLL = minimize(mll_logit_cost,  # Cost function
                   [-7, 0.8],  # Guessed intercept and slope
                   args=(hemoglobin, appetite_d),  # x and y values
                   )
 # Show the result.
-logistic_reg_2
+logistic_reg_MLL
 ```
 
 Notice that we did not have to tell `minimize` to use a very small value for
@@ -1492,13 +1508,13 @@ The values that come back are very similar to our previous, more fragile
 version that used the likelihood:
 
 ```{python}
-inter_MLL, slope_MLL = mr_MLL.x
-predicted_MLL = inverse_logit(inter_MLL + slope_MLL * hemoglobin)
+inter_logistic_reg_MLL, slope_logistic_reg_MLL = logistic_reg_MLL.x
+predicted_MLL = inverse_logit(inter_logistic_reg_MLL + slope_logistic_reg_MLL * hemoglobin)
 ```
 
 ```{python tags=c("remove-input")}
 plot_hgb_app()
-plt.scatter(hemoglobin, predicted_ML, c='gold', label='MLL prediction')
+plt.scatter(hemoglobin, predicted_MLL, c='gold', label='MLL prediction')
 plt.title('Maximum log likelihood cost function')
 plt.legend();
 ```
@@ -1534,8 +1550,8 @@ and slope that Statsmodels found to the ones we got from `minimize` and the
 maximum log likelihood (MLL) cost function.
 
 ```{python}
-print('Intercept from minimize =', inter_MLL)
-print('Slope from minimize =', slope_MLL)
+print('Intercept from minimize =', inter_logistic_reg_MLL)
+print('Slope from minimize =', slope_logistic_reg_MLL)
 ```
 
 Finally, we can use the `predict` method of Statsmodels to generate predicted
@@ -1552,7 +1568,7 @@ Statsmodels:
 ```{python tags=c("remove-input")}
 plot_hgb_app()
 plt.scatter(hemoglobin, sm_predictions,
-            label = 'Statsmodels p', color = 'cyan')
+            label = 'Statsmodels predictions', color = 'cyan')
 plt.legend();
 ```
 
@@ -1598,3 +1614,7 @@ these questions.
   * The slope and intercept of the best-fit log-odds straight line?
 
   Reflect, using the reasoning here, then try it and see.
+
+```{python}
+
+```
