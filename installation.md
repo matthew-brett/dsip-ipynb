@@ -137,6 +137,23 @@ Confirm you are in the `dsip` textbook directory `pwd` (Print Working Directory)
 pwd
 ```
 
+## Making sure you can see your new commands
+
+You are about to install many Python libraries.  Some of these libraries will install commands (scripts) that you can run at the terminal.
+
+You need to make sure that your new commands, installed in the installation step, are available at the terminal.
+
+To do this, run the following command from the `dsip` directory (as above):
+
+```powershell
+python3 configure_shell.py
+```
+
+You should see the instruction to close your Powershell terminal, and open
+it again to see the changes.  Do this.
+
+## Install libraries and commands
+
 Check that the `requirements.txt` file came down with the rest of the textbook files with:
 
 ```
@@ -153,13 +170,18 @@ pip3 install --user -r requirements.txt
 
 :::{note}
 
-Don't worry about warnings like this:
+If you see warnings like this:
 
 ```
 WARNING: The script <some-program> is installed in 'C:\Users\scipy\AppData\Roaming\Python\Python310\Scripts' which is not on PATH.
 ```
 
+Then go back and make sure you have run the `python3 configure_shell.py`
+command above, and you've closed all terminals, and opened a new one.
+
 :::
+
+## Checking the installation
 
 Keep the terminal open.
 
@@ -213,10 +235,10 @@ Congratulations, all checks passed
 
 where the details in the first three lines will depend on your system.
 
-Now you can open the textbook notebooks with:
+You should now be able to open the textbook notebooks with:
 
 ```
-python3 -m jupyter lab
+jupyter lab
 ```
 
 from the `dsip` textbook directory. This will open your web browser in the

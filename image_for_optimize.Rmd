@@ -292,3 +292,9 @@ rmse_for_b_and_c(best_slope, best_inter, x, y)
 ```{python}
 rmse_for_b_and_c(res.slope, res.intercept, x, y)
 ```
+
+## References
+
+```{bibliography} /bib/course_refs.bib
+:filter: docname in docnames
+```
