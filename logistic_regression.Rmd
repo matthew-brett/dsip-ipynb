@@ -25,16 +25,16 @@ import matplotlib.pyplot as plt
 from jupyprint import arraytex, jupyprint
 # Optimization function
 from scipy.optimize import minimize
+# For interactive widgets.
+from ipywidgets import interact
 ```
 
 In this page we will look at another regression technique: logistic regression.
+We use logistic regression when we want to use a *binary categorical*
+variable as our *outcome* variable This contrasts with using a binary categorical 
+variable *as* a predictor variable, as we've seen on the other [textbook](https://lisds.github.io/dsip/linear_regression_categorical_predictors.html) [pages](https://lisds.github.io/dsip/multiple_predictors_statistical_adjustment.html). 
 
-We use logistic regression when we want to predict a *binary categorical*
-outcome variable (or column) from one or more predictor variables (or
-columns). This contrasts with using a binary variable *as* a predictor variable,
-as we've seen on the other textbook pages.
-
-As we've seen, a binary categorical variable is one where an observation can fall
+As we know, a binary categorical variable is one where an observation can fall
 into one of only two categories. We give each observation a label corresponding to their
 category.  Some examples are:
 
@@ -47,17 +47,18 @@ category.  Some examples are:
 * Did a person with a conviction for one offense offend again ("yes" or "no")?
 
 For this tutorial, we return to the [chronic kidney disease
-dataset](../data/chronic_kidney_disease).
+dataset](../data/chronic_kidney_disease), which you have seen previously.
 
 Each oberservational unit in this dataset is one patient.
 
 For each patient, the doctors recorded whether or not the patient had chronic
 kidney disease. This is a *binary categorical variable*; you can see the
 values in the "Class" column. A value of 1 means the patient *did* have CKD; a
-value of 0 means they *did not*.  In this case we are labeling the categories
-with numbers (1 / 0).
+value of 0 means they *did not*.  Remember that these numbers are not true numbers:
+they are labels that denote category membership, but by using numbers as labels 
+we can "trick" a regression model into including the variable.
 
-Many of the rest of the columns are measurements from blood tests and urine tests.
+Many of the rest of the columns in the dataframe are measurements from blood tests and urine tests.
 
 ```{python}
 # read in the data
@@ -109,7 +110,8 @@ Which we read as "we want to model `appetite` as a function of `hemoglobin`".
 
 We will soon find ourselves wanting to do calculations on the values in the
 `appetite` column, and we cannot easily do that with the current string values
-of "good" and "poor", for the reasons we've seen previously.   
+of "good" and "poor", for the reasons we've seen previously, on the categorical 
+predictors [page](https://lisds.github.io/dsip/linear_regression_categorical_predictors.html).
 
 Just as when we use a categorical variable as a predictor,
 our next step is to recode the string values to
@@ -123,9 +125,8 @@ dummy-coding scheme is:
 ```{python}
 # 'replace' replaces the values in the first argument with the corresponding
 # values in the second argument.
-hgb_app['appetite_dummy'] = hgb_app['appetite'].replace(
-    ['poor', 'good'],
-    [0, 1])
+hgb_app['appetite_dummy'] = hgb_app['appetite'].replace(['poor', 'good'],
+                                                        [0, 1])
 hgb_app.head(20)
 ```
 
@@ -141,7 +142,6 @@ good appetite.
 ```{python tags=c("remove-input")}
 # We will use this plotting code several times, so put into a function for
 # later use.
-
 def plot_hgb_app():
     # Build plot, add custom labels.
     colors = hgb_app['appetite'].replace(['poor', 'good'], ['red', 'blue'])
@@ -183,7 +183,7 @@ hemoglobin = hgb_app['hemoglobin']
 appetite_d = hgb_app['appetite_dummy']
 ```
 
-Why not use the same linear regression technique for the present data? After all, our *outcome variable* (`appetite_d`) and our *predictor variable* (`hemoglobin`) here are both sequences of values, with one value for each observational unit (row) in the dataset. The linear model here is shown below, using the first 20 values of each vector (to stop the printout being unwieldy)!:
+Why not use linear regression for the present data? After all, our *outcome variable* (`appetite_d`) and our *predictor variable* (`hemoglobin`) here are both sequences of numbers, with one value for each observational unit (row) in the dataset. The linear model here is shown below, using the first 20 values of each vector (to stop the printout being unwieldy)!:
 
 ```{python}
 # do not worry about this code, it just generates the notation below
@@ -191,7 +191,7 @@ jupyprint("Here is the our model ($ \\vec{y} = b \\vec{x} + \\text{c} + \\vec{\\
 jupyprint(f"${arraytex(np.atleast_2d(appetite_d[:20]).T)} = b * {arraytex(np.atleast_2d(hemoglobin[:20]).T)} + c +" +" \\vec{\\varepsilon}$")
 ```
 
-Let's compare the values in the vectors above to the first 10 values of each variable in the `hgb_app` dataframe, just to
+Let's compare the values in the vectors above to the first 20 values of each variable in the `hgb_app` dataframe, just to
 assure ourselves they are the same:
 
 ```{python}
@@ -201,7 +201,7 @@ hgb_app[['appetite_dummy', 'hemoglobin']].iloc[:20]
 
 This looks like something our linear regression machinery will be able to work with.
 
-In contrast to the vector printout above, we actually have many more than 10 observational units:
+In contrast to the vector printout above, we actually have many more than 20 observational units:
 
 ```{python}
 jupyprint(f'Rows in CKD data: {len(hgb_app)}')
@@ -217,11 +217,11 @@ $ \text{(predicted scores)} = b * \text{(predictor variable)} + c $
 
 Or, in mathematical notation:
 
-$\vec{\hat{y}} = b \vec{x} + \text{c}$
+$\Large \vec{\hat{y}} = b \vec{x} + \text{c}$
 
 As we know, there will be the same number of scores on the
-predictor variable (`hemoglobin`), and the same number of predictions, in
-`predicted`. By contrast, the slope and intercept are single values, defining
+predictor variable (`hemoglobin`), and the same number of predictions ($\hat{y}$).
+By contrast, the slope and intercept are single values, defining
 the line.
 
 We used `minimize` to find the values of the slope and intercept which give the
@@ -262,12 +262,16 @@ Let us start by grabbing the our familiar `ss_any_line` function from the
 
 ```{python}
 def ss_any_line(intercept_and_slope, x_values, y_values):
-    # intercept_and_slope is a list containing two elements, an intercept and a slope.
+    
+    # Intercept_and_slope is a list containing two elements, an intercept and a slope.
     intercept, slope =intercept_and_slope
+    
     # Values predicted from these x_values, using this intercept and slope.
     predicted = intercept + x_values * slope
+    
     # Difference of prediction from the actual y values.
     error = y_values - predicted
+    
     # Sum of squared error.
     return np.mean(error ** 2)
 ```
@@ -306,7 +310,7 @@ Let's calculate the predicted scores, from the now familiar formula:
 
 $\vec{\hat{y}} = b \vec{x} + \text{c}$
 
-Which, in python terms in the current case, is:
+Which, in python terms, in the current case, is:
 
 ```
 predicted_scores= lin_reg_slope * hemoglobin + lin_reg_intercept
@@ -375,7 +379,7 @@ plt.plot(fine_x, fine_y, linewidth=1, linestyle=':')
 plt.legend(loc=(1.1, 0.5));
 ```
 
-The problem here is that linear regression can produce predicted values ($\hat{y}$) ranging from negative infinity to positive infinity. One way of saying this is that the predictions from linear regression are unonstrained or unbounded.
+The problem here is that linear regression can produce predicted values ($\hat{y}$) ranging from negative infinity to positive infinity. One way of saying this is that the predictions from linear regression are unconstrained or unbounded.
 
 However, the outcome variable we are trying to predict (`appetite_d`) *is* constrained/bounded: it can only take values of either 0 or 1.
 
@@ -398,7 +402,7 @@ plt.plot(fine_x_big, fine_y_big, linewidth=1, linestyle=':')
 plt.legend(loc=(1.1, 0.5));
 ```
 
-These reflections make as wonder whether we should be using something other
+These reflections might make as wonder whether we should be using something other
 than a simple, unconstrained straight line for our predictions.
 
 ## Another prediction line
@@ -421,7 +425,6 @@ The new prediction line is in gold.
 # This is the machinery for making the sigmoid line of the plots below.  We
 # will come on that machinery soon.  For now please ignore this code, and
 # concentrate on the plots below.
-
 def inverse_logit(y):
     """ Reverse logit transformation
     """
@@ -508,10 +511,11 @@ plt.plot([10, 0],
 plt.legend();
 ```
 
-The sigmoid curve is exploiting the fact that probabilities range between 0 and 1,
-and that the potential values that our outcome variable can take are 0 or 1. This
+The sigmoid curve, which we get via logistic regression, is exploiting the fact that probabilities range between 0 and 1,
+and that our outcome variable is also constrained to be either 0 or 1. This
 means we can meaningfully show the prediction line (showing the predicted 
-probabilities) and the outcome variable scores (0 or 1) on the same plot.
+probabilities) and the outcome variable scores (0 or 1) on the same plot. (We will come 
+on to the mechanics of the fitting process later in the page).
 
 Because of these appealing features, let's say we do want to use this kind of
 sigmoid line to predict `appetite_d`.  So far, we have only asked `minimize`
@@ -519,7 +523,7 @@ to predict directly from a straight line - for example, in the `ss_any_line` fun
 
 How can we get `minimize` to predict from a family of sigmoid curves, as here? 
 
-We'd like to keep the machinery here as familiar as possible. So ideally, we'd like
+We'd like to keep the machinery here as familiar as possible. So, ideally we'd like
 to send a slope and intercept pair to `minimize`. How might we do that for a sigmoid curve,
 given that a slope and intercept denote a straight line, rather than a curve?
 
@@ -528,7 +532,7 @@ into a straight line, where the y values can vary from large negative number to 
 positive number. Doing such a conversion, so we have a slope and
 intercept that `minimize` can work with easily.
 
-Fortunately, our mathematician friends can assure us that we can in factgo from our sigmoid curve (ranging
+Fortunately, our mathematician friends can assure us that we can in fact go from our sigmoid curve (ranging
 between 0 and 1) to a straight line with unconstrained y values, in two fairly simple steps. The
 next sections will cover those steps.  The two steps are:
 
@@ -539,14 +543,14 @@ next sections will cover those steps.  The two steps are:
   odds predictions to *log* odds predictions, which can vary from
   very large negative number to very large positive number.
   
-(Do not worry if these steps don't make sense yet - we'll go over them in more detail below)!
+(Do not worry if these steps don't make sense yet - we'll go over them in more detail below).
 
 These two transformations together are called the *log-odds* or
 [logit](https://en.wikipedia.org/wiki/Logit) transformation.  *Logistical
 regression* is regression using the *logit* transform.  Applying the logit
 transform converts the sigmoid curve to a straight line.
 
-We will explain more about the two stages of the transform below, but for now, here are the two stages in action.
+We will explain more about the two stages of the transform below, but for now, here are the two stages in action, shown graphically.
 
 This is the original sigmoid curve above, with the predictions, in its own
 plot:
@@ -594,17 +598,29 @@ We can do this conversion *in either direction*:
 * straight line -> sigmoid curve
 * sigmoid curve -> straight line
 
-**This has the important consequence that** we can get `minimize` to find us a straight line that
-fits the data well *on the log odds scale*, then we can use our converstion to go back to
-the sigmoid curve (on the original scale of the data, where the outcome variable ranges
-between 0 and 1).
+**This has the important consequence that** we can get `minimize` to find us a straight line,
+then we can use our conversion to go back to the sigmoid curve. The sigmoid curve is on the original scale
+of the data, where the outcome variable ranges between 0 and 1. We can then calculate error values
+from the sigmoid curve and the original data points.
 
-The next few sections go into more detail on the odds and logarithm steps.
+Pause here and re-read the last paragraph again. It is very important to understand
+*why* we are doing these transformations, in order to not get lost in the detail.
+To reiterate these are the steps:
+
+- we (or `minimize`) generate a straight line (via a slope/intercept pairing)
+- we transform this straight line into a sigmoid curve
+- we assess use a goodness-of-fit metric (like error scores) to assess the fit of the sigmoid curve
+- we repeat this process until we (or `minimize`) find the best-fitting sigmoid curve
+
+The next few sections go into more detail on the odds and logarithm transformation steps.
 
 ## Probability and Odds
 
 
-For logistic regression, in contrast to linear regression, we are interested in
+Because logistic regression uses probability and odds, we will go over these
+foundational concepts in this section.
+
+Specifically, for logistic regression, in contrast to linear regression, we are interested in
 predicting the *probability of an observation falling into a particular outcome
 category* (0 or 1). 
 
@@ -613,7 +629,7 @@ So, we are interested in the probability of a patient having `good`
 appetite, predicted from the patient's `hemoglobin` score.
 
 We can think of probability as the *proportion of times* we expect to see a
-particular outcome.
+particular outcome. 
 
 For example, there are 139 patients with `good` appetite in this data frame,
 and 158 patients in total.  If you were to repeatedly draw a single patient at
@@ -626,7 +642,7 @@ hgb_app['appetite_dummy'].value_counts()/len(hgb_app)
 
 Because the patient's appetite can only be `good` or `poor`, and because the
 probabilities of all possible options have to add up to 1, the probability of
-the patient having a `poor` appetite is $1 - 0.88$, which is about 0.12.
+the patient having a `poor` appetite is $1 - 0.88$, which is about $0.12$.
 
 So, the probability can express the *proportion of times* we expect to see some
 *event of interest* - in our case, the event of interest is "good" in the
@@ -639,18 +655,28 @@ We can think of this same information as an *odds*.
 We often express probabilities as odds. To break this down, for clarity let's think of a scenario with
 some nice, clean probabilities.
 
-Imagine there are 100 people standing in a room. 20 of them are civil servants. If we picked a person at random, the probability they
-will be a civil servant is 20/100. By contrast, the odds is the number of times we expect to see the event of interest
-(e.g. being a civil servant) for every time we expect to see the event of no interest (not
+Imagine there are 100 people standing in a room. 20 of them are civil servants. In this scenario, our *event of interest* is "being a civil servant". 
+If we picked a person at random, the probability they will be a civil servant is:
+
+$\text{Prob(Civil Servant}) = \Large \frac{20}{100}$.
+
+By contrast, the odds is the number of times we expect to see the event of interest
+(e.g. being a civil servant) for every time we expect to see the event of no interest (NOT
 being a civil servant):
 
 $ \Large \text{odds} = \frac{\text{number of things of interest}}{\text{number of things NOT of interest}}$
 
-In the civil servant example, the *odds* of being a civil servant, if we pick a person at random, are 80/20. 
+In the civil servant example, the *odds* of being a civil servant, if we pick a person at random, are:
+
+$\text{Odds(Civil Servant}) = \Large \frac{20}{80}$.
 
 This is just a way of saying a probability in a different way, and we can convert easily between probabilities and odds.
 
-To convert from a probability to an odds, we remember that the odds is the number of times we expect to see the event of interest for every time we expect to see the event of no interest.   This is the probability (proportion) for the event of interest, divided by the probability (proportion) of the event of no interest.  Say the probability $p$ is some value (it could be any value):
+To convert from a probability to an odds, we remember that the odds is the number of times we expect to see the event of interest for every time we expect to see the event of no interest.   This is the probability (proportion) for the event of interest, divided by the probability (proportion) of the event of NO interest.  
+
+We get the probability of events of no interest by subtracting the probability of an event of interest from 1.
+
+Let's look at the probability $p$:
 
 ```{python}
 # Our probability of interest 
@@ -666,25 +692,61 @@ The equivalent odds here is:
 
 $\Large \text{odds} = \frac{\text{number of things of interest}}{\text{number of things NOT of interest}} = \frac{20}{80} = 0.25$
 
+
+We can also calculate the odds using this formula:
+
+$\Large \text{odds} = \frac{\text{Prob(Event of Interest)}}{1 - \text{Prob(Event of Interest)}}$ 
+
 ```{python}
 # odds is proportion of interest, divided by proportion of no interest.
 odds = p / (1 - p)
 odds
 ```
 
-Notice the odds is less than one, because the probability of an event of interest (`p`) was less than 0.5.  
+$(1 - p)$ gives the the probability of events which are not of interest (in this case, this is people who are NOT civil servants):
 
-**Odds of 1 indicate that the event of interest is equally as likely as events not of interest.**
+$\text{Prob(Civil Servant}) = \Large \frac{20}{100}$
+
+$\text{Prob(NOT Civil Servant}) = \Large \frac{80}{100}$
+
+Let's demonstrate this in python:
+
+```{python}
+(1 - p) == 80/100
+```
+
+When you are interpretting odds:  
+
+**Odds of 1 indicate that the event of interest is equally as likely as events NOT of interest.**
 
 **Odds of less than one means that the event of interest is less likely to happen than
-events not of interest.**.  
+events NOT of interest.**.  
 
 **Odds of greater than one means the event of interest is more likely to
-happen than events not of interest.**
+happen than events NOT of interest.**
 
-If the probability of an event of interest is 0, then the odds are 0.
+**If the probability of an event of interest is 0, then the odds are 0.**
 
-As the probability of an event of interest gets close to 1, the odds gets very large - this means the event of interest is many many times more likely than events of no interest:
+You can use the slider in the output of the cell below to set the probability of a hypothetical event of interest.
+(If you want a probability of 50%, set the slider to 50, if you want a probability of 30%, set the slider to 30 and so on).
+The printout will then allow you to relate the probability to the odds of the event of interest:
+
+```{python}
+def odds_interact(probability_percent=50):
+
+    assert (probability_percent >= 0) & (probability_percent <=99.99), "You must enter a percentage between 0 and 99.99!"
+
+    p = probability_percent/100
+
+    jupyprint(f"If a probability of an event of interest is **{probability_percent}%**:")
+    jupyprint("$\\text{Prob(Event of Interest)} = \\frac{"+f"{probability_percent}"+"}{100}$")
+    jupyprint(f"Then the odds of the event of interest are **{round(p/(1-p), 4)}**")
+    jupyprint("$\\text{Odds(Event of Interest)} = \\frac{"+f"{probability_percent}"+"}{"+f"{100-probability_percent}"+"}$")
+
+interact(odds_interact, probability_percent=(0, 99, 1))
+```
+
+As the probability of an event of interest gets very close to 1, the odds gets very large - this means the event of interest is many many times more likely than events of no interest:
 
 ```{python}
 p_approaching_1 = 0.9999999999999999
@@ -692,7 +754,8 @@ large_odds = p_approaching_1 / (1 - p_approaching_1)
 large_odds
 ```
 
-We can also convert from odds to probabilities.  Remember the odds is
+Remember the example above where the probability of being a civil servant was
+$\frac{20}{100}$? We can also convert from odds to probabilities.  Remember the odds is
 the number of times we expect to see the event of interest, divided by the
 number of times we expect to see the event of no interest.  The probability is
 the proportion of events of interest out of all events.  
@@ -707,7 +770,7 @@ p_from_odds = odds / (1 + odds)
 p_from_odds
 ```
 
-Summary - we can convert probabilities to odds with:
+In summary here is that we can convert probabilities to odds with:
 
 ```{python}
 # convert from probability to odds
@@ -715,15 +778,16 @@ odds = p / (1 - p)
 odds
 ```
 
-Convert odds to probabilities with:
+And we can convert odds to probabilities with:
 
 ```{python}
+# convert odds to probabilities
 p = odds / (odds + 1)
 p
 ```
 
 As you've seen, for the current data, and for sigmoid probability curve we showed you above, when we apply the conversion to convert the probability
-values to odds, we get the following:
+values to odds, we get the following (this is the graphical perspective on the probability-to-odds transformation just shown above):
 
 ```{python tags=c("remove-input")}
 # show a plot of the probability prediction curve
@@ -746,12 +810,14 @@ plt.xlabel('Hemoglobin')
 plt.ylabel('odds');
 ```
 
-Notice that the odds we found vary very close to 0 (for probability
+Notice that the odds we found vary from very close to 0 (for probability
 predictions very close to 0) to very large (for probability
 predictions very close to 1).
 
 Notice too that our graph looks exponential, and we want it to be a straight
-line.  Our next step is to apply a *logarithm* transformation.
+line (so we can pass a slope/intercept pair to `minimize`).  
+
+Our next step is to apply a *logarithm* transformation.
 
 ## The logarithm transform
 
@@ -771,7 +837,7 @@ would I have to raise a specific other number to, in order to get the first numb
 So, let's call that first number $a$, let's raise it to the the power $n$ and call the result
 $y$:
 
-$a^n = y$
+$\Large a^n = y$
 
 Here's an example:
 
@@ -786,7 +852,9 @@ A logarithm tells us, given our value of $a$, what power would we have to raise 
 
 We can write this as:
 
-$\log_{a}(y) = n$
+$\Large \log_{a}(y) = n$
+
+You can read this as "if you give me the number $y$, what power would I have to raise the number $a$ to, in order to get $y$?".
 
 As you can imagine, `numpy` functions exist to calculate logs:
 
@@ -808,7 +876,7 @@ ax0, ax1 = axes
 ax0.plot(n, y)
 ax0.set_xlabel('n')
 ax0.set_ylabel('y')
-ax0.set_title(r'$y=10^n$')
+ax0.set_title('Exponential Graph \n $y=10^n$')
 ax1.set_xlabel('n')
 ax1.set_ylabel('log(y)')
 ax1.plot(n, np.log10(y))
@@ -875,7 +943,19 @@ refresher](logarithms_refreshed) page):
 
 ```{python}
 # np.exp reverses the effect of np.log.
+# let's take some values...
 some_values = np.array([1, 0.5, 3, 6, 0.1])
+some_values
+```
+
+```{python}
+# let's find the logarithm of these values...
+logged_values = np.log(some_values)
+logged_values
+```
+
+```{python}
+# np.exp reverses the effect of np.log
 values_back = np.exp(np.log(some_values))
 values_back
 ```
@@ -899,10 +979,22 @@ First we convince ourselves that `inverse_logit` does indeed reverse the `logit`
 transform:
 
 ```{python}
+# some probability values
 some_p_values = np.array([0.01, 0.05, 0.1, 0.5, 0.9, 0.95, 0.99])
+some_p_values
+```
+
+```{python}
+# we apply the logit transformation
 some_log_odds = logit(some_p_values)
+some_log_odds
+```
+
+```{python}
+# we use the inverse logit transformation to go back to the original values
 back_again = inverse_logit(some_log_odds)
-print('Logit, then inverse_logit returns the original data', back_again)
+print('Logit, then inverse_logit returns the original data:')
+back_again
 ```
 
 The plot above has the sigmoid curve p-value predictions, and the p-value
@@ -927,7 +1019,27 @@ ax1.set_ylabel('inverse_logit result');
 ax1.plot(fine_x, inverse_logit(fine_y_or_log), linewidth=1, linestyle=':');
 ```
 
+In summary here:
+
+* the logit transformation converts probabilities to odds, then to log-odds
+* the inverse logit transformation converts log odds to odds, then to probabilities
+
+Let's pause to recapitulate why we are covering these transformations:
+
+- we are interested in modelling the probability of some binary categorical outcome, as a function of another variable
+- to do this, we'd like to pass a slope/intercept pair to `minimize`, but a straight line doesn't
+  fit the binary categorical outcome variable very well
+
+So, to our solution here is:
+- we (or `minimize`) generate a straight line (via a slope/intercept pairing)
+- we transform this straight line into a sigmoid curve (usinverse logit ing the transfrmations sh) above: 
+- we assess use a goodness-of-fit metric (like error scores) to assess the fit of the sigmoid curve
+- we repeat this process until we (or `minimize`) find the best-fitting siegmoid curv
+
 ## Effect of the Logit slope and intercept on the sigmoid
+
+Let's explore what effect specific slope/intercept values have on the shape
+of the sigmoid curve.
 
 Changing the intercept of the logit (log-odds) straight line moves the
 corresponding inverse logit sigmoid curve left and right on the horizontal
@@ -965,7 +1077,8 @@ plt.legend();
 
 ## A first-pass at logistic regression
 
-You may now see how we could use `minimize` with a slope and intercept:
+Hopefully now you can see how we can use `minimize`, with a slope and intercept pair,
+to fit a sigmoid curve to a binary categorical outcome variable.
 
 Remember that `minimize` needs a *cost function* that takes some parameters -
 in our case, the intercept and slope — and returns a score, or cost for the
@@ -973,13 +1086,14 @@ parameters.
 
 In the `ss_any_line` cost function above, the score it returns is just the sum
 of squared prediction errors from the line.  But the cost function can do
-anything it likes to generate a score from the line.
+anything it likes to generate a score from the line or curve.
 
-In our case, we're going to make a cost function that takes the intercept and
-slope, and generates predictions using the intercept and slope and `hemoglobin`
-values.  But these predictions are for the log-odds transformed values, on the
-straight line.  So the cost function then converts the predictions into p value
-predictions, on the corresponding sigmoid, and compares these predictions to the 0 / 1 values in `appetite_d`.
+In our case, we're going to make a cost function that:
+- takes the intercept and slope, and generates predictions using the intercept and slope and `hemoglobin`
+values.
+- the cost function then converts these predictions into probability
+predictions, on a corresponding sigmoid curve, and compares these predictions to the 0 or 1 values
+in `appetite_d`.
 
 For example, let's say we want to get a score for the intercept -7 and the
 slope 0.8.
@@ -1002,18 +1116,12 @@ sigmoid_predictions = inverse_logit(sl_predictions)
 
 plt.scatter(hemoglobin, sigmoid_predictions, color = 'gold')
 plt.xlabel('Hemoglobin')
-plt.ylabel('Sigmoid (p-value) predictions');
+plt.ylabel('Sigmoid (probability) predictions');
 ```
 
 Finally, we want to compare the predictions to the actual data to get a score.
 One way we could do this is our good old sum of the squared errors between the
 sigmoid p-value predictions and the 0 or 1 values:
-
-```{python}
-sigmoid_error = appetite_d - sigmoid_predictions
-sigmoid_score = np.sum(sigmoid_error ** 2)
-sigmoid_score
-```
 
 ```{python}
 plot_hgb_app()
@@ -1028,22 +1136,29 @@ plt.ylabel('Sigmoid (p-value) predictions')
 plt.legend(loc=(1.1, 0.5));
 ```
 
+```{python}
+sigmoid_error = appetite_d - sigmoid_predictions
+sigmoid_sum_squared_error = np.sum(sigmoid_error ** 2)
+sigmoid_sum_squared_error
+```
+
 Next we make the cost function that minimize will use.  It must accept an array
 of parameters (an intercept and slope), and calculate the root mean squared error,
-using the predicted p-values:
+using the predicted probabilities:
 
 ```{python}
 def ss_logit(intercept_and_slope, x_values, y_values):
+    
     # Unpack intercept and slope into values.
     intercept, slope = intercept_and_slope
     
     # Predicted values for log-odds straight line.
     predicted_log_odds = intercept + slope * x_values
     
-    # Predicted p values on sigmoid.
+    # Convert the straight line predictions to a sigmoid probability curve.
     predicted_probabilities = inverse_logit(predicted_log_odds)
     
-    # Prediction errors.
+    # Calculate the prediction errors.
     sigmoid_error = y_values - predicted_probabilities
     
     # Root mean squared error
@@ -1064,6 +1179,7 @@ predictions to probabilities on the sigmoid, and tests those against the real
 Now let's see the cost function in action:
 
 ```{python}
+# use `minimize` to find the slope/intercept which give the minimum value of our cost function
 min_res_logit = minimize(ss_logit, [-7, 0.8], args=(hemoglobin, appetite_d))
 min_res_logit
 ```
@@ -1076,8 +1192,8 @@ First get the sigmoid predictions from this line:
 ```{python}
 logit_ss_inter, logit_ss_slope = min_res_logit.x
 
-jupyprint(f"Intercept of best-fitting line on the log odds scale: {logit_ss_inter.round(2)}")
-jupyprint(f"Slope of best-fitting line on the log odds scale: {logit_ss_slope.round(2)}")
+jupyprint(f"Intercept of best-fitting line on the log odds scale: **{logit_ss_inter.round(2)}**")
+jupyprint(f"Slope of best-fitting line on the log odds scale: **{logit_ss_slope.round(2)}**")
 ```
 
 ```{python}
@@ -1087,6 +1203,8 @@ predicted_log_odds = logit_ss_inter + logit_ss_slope * hemoglobin
 predicted_log_odds
 ```
 
+Then convert these log-odds (straight line) predictions to probabilities, using the inverse logit transformation:
+
 ```{python}
 # Predicted p values on sigmoid.
 logit_ss_predicted_prob_of_1 = inverse_logit(predicted_log_odds)
@@ -1094,7 +1212,7 @@ logit_ss_predicted_prob_of_1 = inverse_logit(predicted_log_odds)
 logit_ss_predicted_prob_of_1
 ```
 
-Then plot:
+Then plot the predictions, from the best-fitting slope and intercept pair:
 
 ```{python tags=c("remove-input")}
 plot_hgb_app()
@@ -1118,13 +1236,13 @@ Our sigmoid prediction from sum of squares above looks convincing enough, but,
 is there a better way of scoring the predictions from our line, than sum of
 squares? E.g. could we use a different cost function which would work better?
 
-It turns out there is another quite different and useful way to score the
+It turns out there is another quite different and very useful way to score the
 predictions, called *likelihood*.  For reasons we discuss in [this
 page](logistic_convexity), all standard implementations of logistic regression
 that we know of, use the *likelihood* measure that we describe below, instead
 of the sum of squares measure you see above.
 
-Likelihood asks the question: assuming our predicting line, how likely are the
+Likelihood asks the question: assuming our predicting line, how likely  is the
 sequence of actual 0 and 1 values that we see?
 
 To answer this question, we first ask this question about the individual 0 and 1
@@ -1132,7 +1250,7 @@ values.
 
 We start with our intercept of -7 and slope of 0.8 for the straight-line
 log-odds values.  We generate the straight-line predictions, then convert them
-to sigmoid p-value predictions.
+to sigmoid probability predictions.
 
 ```{python}
 # generate our straight line predictions
@@ -1140,9 +1258,13 @@ log_odds_predictions = -7 + hemoglobin * 0.8
 
 # convert these to sigmoid probability predictions
 sigmoid_p_predictions = inverse_logit(log_odds_predictions)
+
+pd.DataFrame({'Log Odds Prediction': log_odds_predictions,
+             'Probability Prediction': sigmoid_p_predictions})
 ```
 
-Remember, these are the predicted probabilities of a 1 label (`appetite_d == 1`).  Let's rename to remind ourselves:
+Remember, the probability predictions are the predicted probabilities of `appetite_d == 1`. 
+Let's name the predictions appropraitely to remind ourselves:
 
 ```{python}
 predicted_prob_of_1 = sigmoid_p_predictions
@@ -1165,10 +1287,12 @@ observation_1
 ```
 
 The `predicted_prob_of_1` value is the probability that we will see a `appetite_d` score of 1 for this
-observation.   The `appetite_d` score was, in fact, 1.  
+observation.   
 
-Therefore the **predicted probability that we will see the actual value is just the corresponding
-`predicted_prob_of_1` value**:
+The `appetite_d` score for this observation was, in fact, 1.  
+
+Therefore the predicted probability that we will see the *actual `appetite_d` score is just the corresponding
+`predicted_prob_of_1` value*:
 
 ```{python}
 predicted_prob_of_actual_score_obs_1 = observation_1['predicted_prob_of_1']
@@ -1189,8 +1313,18 @@ The probability for an `appetite_dummy` value of 1, for this observation is:
 observation_2['predicted_prob_of_1']
 ```
 
-Because the values can only be 0 or 1, the predicted probability of an
-`appetite_dummy` of 0 must be 1 minus the (predicted probability of 1):
+However, **and this is absolutely crucial**: the actual `appetite_d` score of this observational unit 
+was 0.
+
+*Therefore the predicted probability of the **actual** score for this observational unit is **NOT** the predicted probability of a score of 1.*
+
+The actual score was 0, so we need to calculate the predicted probability of a score of 0.
+
+You'll remember that we can calculate the probability of the event NOT of interest by:
+
+$\text{Prob(Event NOT of Interest)} = 1 - \text{Prob(Event of Interest)}$
+
+Let's do this for the current observational unit:
 
 ```{python}
 predicted_prob_of_actual_score_obs_2 = 1 - observation_2['predicted_prob_of_1']
@@ -1203,7 +1337,7 @@ We'll do with a for loop to make it conceptually clearer what is happening:
 
 ```{python}
 # an empty array to store our predicted probability of getting the actual `appetite_d` score, for
-#each observational unit
+# each observational unit
 predicted_prob_of_actual_score = np.empty(len(hgb_predicted))
 
 # loop over all the observations
@@ -1218,7 +1352,7 @@ for i in np.arange(len(hgb_predicted)):
     # if the current observational unit (patient) had an `appetite_d` score of 0...
     if hgb_predicted['appetite_dummy'].iloc[i] == 0:
         
-        # ...then record 1 MINUS the predicted probability of 1 as the predicted probability of its actual score
+        # ...then record `1 minus the predicted probability of 1` as the predicted probability of its actual score
         predicted_prob_of_actual_score[i] = 1 - hgb_predicted['predicted_prob_of_1'].iloc[i]
         
 # Put this into the data frame for display
@@ -1226,17 +1360,33 @@ hgb_predicted['predicted_prob_of_actual_score'] = predicted_prob_of_actual_score
 hgb_predicted
 ```
 
-There's a fancy short-cut to the several lines above, that relies on the fact
-that multiplying by 0 gives 0.  
+Go through each row of the dataframe above. Notice that for observational units (patients) who
+have an `appetite_d` score of 1, the `predicted_prob_of_actual_score` just equals their
+`predicted_prob_of_1`. 
 
-We can form the `predicted_prob_of_actual_score` column by first
-multiplying the 0 or 1 label column values by the values in `predicted_prob_of_1`.  This
+For observational units (patients) who have an `appetite_d` score of 0, the `predicted_prob_of_actual_score`
+DOES NOT equal their  `predicted_prob_of_1`, it equals `1 - predicted_prob_of_1`.
+
+**This is critical for understanding logistic regression:** for any slope/intercept pair we might use,
+through the process just shown, we have a vector of probability predictions of the actual `appetite_d` score, for each observational unit.
+We want all of these probabilities to be high e.g. we want the slope/intercept pair to give 
+good predictions of the actual scores. We can use this to compare how well different
+slope/intercept pairs fit the data.
+
+**Pause for Questions**: let's take a pause to make sure the process just shown is clear.
+
+There's a fancy short-cut to calculating the probabilities of the actual `appetite_d` scores.
+
+We can create the `predicted_prob_of_actual_score` column by first
+multiplying the 0 or 1 `appetite_d` scores by the values in `predicted_prob_of_1`.  This
 correctly sets the `predicted_prob_of_actual_score` values for labels of 1, and leaves the
 remainder as 0. 
 
 Then we reverse the 0 and 1 labels by subtracting from 1, and
 multiply by `1 - predicted_prob_of_1` to set the 0 values to their correct values.  Adding
 these two results gives us the correct set of values for both 1 and 0 labels.
+
+Let's break this down:
 
 ```{python}
 # get the predicted probability of the actual `appetite_d` scores, for
@@ -1329,7 +1479,7 @@ def simple_ml_logit_cost(intercept_and_slope, x, y):
     # Convert these predictions to probabilities.
     predicted_prob_of_1 = inverse_logit(predicted_log_odds)
     
-    # Calculate predicted probabilities of the actual scores.
+    # Calculate predicted probabilities of the actual scores (THIS IS THE MOST IMPORTANT STEP TO UNDERSTAND!)
     predicted_prob_of_actual_scores = y * predicted_prob_of_1 + (1 - y) * (1 - predicted_prob_of_1)
 
     # Multiply the predicted probabiity of the actual score
@@ -1339,7 +1489,15 @@ def simple_ml_logit_cost(intercept_and_slope, x, y):
     return -likelihood
 ```
 
-We can try that cost function, starting at our familiar intercept of -7 and
+**This is another key to understanding the logistic regression cost function:** 
+- we generate predicted probabilities of an outcome score of  (`appetite_d` == 1)1, based on a slope/intercept pair
+- we then calculate the predicted probability of each observational un'its *actual* score
+- we multiply the probabilities of the actual score together, giving us a *likeihood* value
+- the likelihood value is a metric of goodness-of-fit, like the sum of squared error
+- we find the slope/intercept pair that gives the best fitting sigmoid, measured via the likel
+- in practive we `minimize` the negative of the likelihoodihood
+
+We canour new that cost function, starting at our familiar intercept of -7 and
 slope of 0.8.
 
 Before we do, there is one extra wrinkle, that we will solve in another way
@@ -1360,13 +1518,17 @@ logistic_reg_ML = minimize(simple_ml_logit_cost,  # Cost function
 logistic_reg_ML
 ```
 
-`minimize` complains that it was not happy with the numerical accuracy of its
-answer, and we will address that soon.  For now, let us look at the predictions
-to see if they are reasonable.
+Let's look at the predictions to see if they are reasonable.
 
 ```{python}
+# get the parameter estimates back from `minimize`
 inter_logistic_reg_ML, slope_logistic_reg_ML = logistic_reg_ML.x
+
+# generate probability predictions (predicting probability of `appetite_d == 1`)
 predicted_logistic_reg_ML = inverse_logit(inter_logistic_reg_ML + slope_logistic_reg_ML * hemoglobin)
+
+# show the predictions
+predicted_logistic_reg_ML 
 ```
 
 ```{python tags=c("remove-input")}
@@ -1457,6 +1619,7 @@ monotonic with respect to the likelihood, and we can use it instead of the
 likelihood, in our cost function.
 
 ```{python}
+# show the relationship between the likelihood and log-likelihood
 likelihood_values = np.linspace(1e-5, 1, 1000)
 plt.plot(likelihood_values, np.log(likelihood_values))
 plt.xlabel('Likelihood')
@@ -1469,12 +1632,20 @@ above, that generates the tiny value for likelihood.  We can just return the
 be a manageable negative number, even when the resulting likelihood is tiny.
 
 ```{python}
+# the likelihood value from our guessed slope and intercept
+likelihood
+```
+
+```{python}
+# the log likelihood value, for the tiny likelihood above
 log_likelihood
 ```
 
 This trick gives us a much more tractable number to return from the cost
 function, because the log likelihood is much less affected by errors from lack
 of precision in the calculation.
+
+Let's modify our cost function, so it is now safer/easier for `minimize` to work with:
 
 ```{python}
 def mll_logit_cost(intercept_and_slope, x, y):
@@ -1560,8 +1731,8 @@ and slope that Statsmodels found to the ones we got from `minimize` and the
 maximum log likelihood (MLL) cost function.
 
 ```{python}
-print('Intercept from minimize =', inter_logistic_reg_MLL)
-print('Slope from minimize =', slope_logistic_reg_MLL)
+jupyprint(f'Intercept from minimize = **{round(inter_logistic_reg_MLL, 3)}**')
+jupyprint(f'Slope from minimize = **{round(slope_logistic_reg_MLL, 3)}**')
 ```
 
 Finally, we can use the `predict` method of Statsmodels to generate predicted
@@ -1578,7 +1749,7 @@ Statsmodels:
 ```{python tags=c("remove-input")}
 plot_hgb_app()
 plt.scatter(hemoglobin, sm_predictions,
-            label = 'Statsmodels predictions', color = 'cyan')
+            label = 'Statsmodels predictions \n(Logistic Regression)', color = 'cyan')
 plt.legend();
 ```
 
@@ -1594,37 +1765,24 @@ np.max(np.abs(predicted_MLL - sm_predictions))
 
 That is very close to 0. The models are making almost identical predictions.
 
+## The meaning of the parameters
+
+The slope and intercept returned by logistic regression show us something the (kind of) the exact same thing
+in logistic regression as they tell us in linear regression:
+
+- the intercept tells us the predicted outcome variable score for an observational unit where the predictor score == 0
+- the slope tells us the expected change in the *log-odds* of an outcome variable score of 1, for a 1-unit chance in the predictor
+
+It's not very intuitive to interpret the slope on the log-odds scale that it naturally comes to us on!
+We can use `np.exp()` to convert the slope to the *odds scale*, so it has more intuitive meaning:
+
+```{python}
+np.exp(slope_logistic_reg_MLL)
+```
+
+We interpret this as "the odds of `appetite_d == 1` are multiplied byw2.2246for each 1-unit increase in the predictor.on
+
 ## Summary
 
 This tutorial has shown you how to do binary logistic regression with one numerical predictor variable.
 
-
-## Exercises for reflection
-
-You might want to read the [logarithm refresher](logarithms_refreshed) page for
-these questions.
-
-* Consider the expression `np.exp(y)` in the `inverse_logit` expression above.
-  This means "raise `np.e` to the power of the values in `y`", and could
-  equally well be written as `np.e ** y` (it would give exactly the same
-  result).  Now consider changing `np.exp(y)` to `10 ** y`.  Now we are working
-  in base 10 instead of base `np.e`.  What would happen to:
-
-  * The best-fit p values predictions returned via `minimize`?
-  * The slope and intercept of the best-fit log-odds straight line?
-
-  Reflect, using the reasoning here, then try it and see.
-
-* Consider the expression `np.sum(np.log(predicted_prob_of_actual_score)` in the
-  `mll_logit_cost` cost function.  This is using `np.log`, which is log to the
-  base `np.e`.  Consider what would happen if you change this expression to
-  `np.sum(np.log10(pp_of_actual_labels))` (log to the base 10).  What would happen to:
-
-  * The best-fit p values predictions returned via `minimize`?
-  * The slope and intercept of the best-fit log-odds straight line?
-
-  Reflect, using the reasoning here, then try it and see.
-
-```{python}
-
-```
